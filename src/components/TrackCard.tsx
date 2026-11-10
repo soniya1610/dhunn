@@ -1,4 +1,5 @@
 
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePlayer } from '../context/PlayerContext';
 import { useTheme } from '../context/ThemeContext';
@@ -19,7 +20,10 @@ export default function TrackCard({ track, queue }: Props) {
       onPress={() => play(track, queue)}
       style={[
         styles.card,
-        { backgroundColor: colors.surface },
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
       ]}
       accessibilityRole="button"
       accessibilityLabel={`Play ${track.title} by ${track.artist}`}
@@ -28,9 +32,12 @@ export default function TrackCard({ track, queue }: Props) {
         <Artwork
           uri={track.artwork}
           size={130}
-          radius={14}
+          radius={15}
           seed={track.title}
         />
+        <View style={styles.playOverlay}>
+          <Ionicons name="play" size={17} color="#FFFFFF" />
+        </View>
       </View>
 
       <Text
@@ -52,23 +59,36 @@ export default function TrackCard({ track, queue }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 142,
-    padding: 7,
-    borderRadius: 16,
+    width: 148,
+    padding: 8,
+    borderRadius: 19,
+    borderWidth: 1,
   },
   artworkContainer: {
-    borderRadius: 14,
+    borderRadius: 15,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  playOverlay: {
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#914CE0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 13,
-    fontWeight: '700',
-    marginTop: 9,
+    fontWeight: '800',
+    marginTop: 10,
     marginHorizontal: 2,
   },
   artist: {
-    fontSize: 12,
-    marginTop: 3,
+    fontSize: 11,
+    marginTop: 4,
     marginHorizontal: 2,
     marginBottom: 4,
   },

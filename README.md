@@ -1,121 +1,163 @@
-# Dhunn – Music Player 🎵
+# 🎵 Dhunn – Your Music, Your Mood
 
-A modern mobile music player built with **React Native and Expo**. Dhunn provides a clean interface for discovering music, managing your library, creating playlists, and enjoying a personalized listening experience.
+<p align="center">
+  <strong>A modern music player built with React Native and Expo.</strong><br/>
+  Discover music, explore songs, manage your playlists and enjoy a personalized listening experience.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React_Native-0.88.1-61DAFB?logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Expo-SDK%2058-000020?logo=expo" />
+  <img src="https://img.shields.io/badge/TypeScript-6.0.3-3178C6?logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Platform-Android-green?logo=android" />
+</p>
+
+## 📱 Download APK
+
+Try the latest Android version of Dhunn:
+
+**[⬇️ Download Dhunn APK](https://expo.dev/artifacts/eas/955LdLG11CgGFOoISMUzZNmG11T0sNn2KBUJiIdWHkg.apk)**
+
+> Download the APK, install it on your Android device and start listening.
+
+---
 
 ## ✨ Features
 
-- **Authentication:** Login and signup screens.
-- **Home:** Main music player dashboard.
-- **Search:** Search interface for finding music.
-- **Library:** Manage your personal music library.
-- **Playlists:** Organize music into playlists.
-- **Now Playing:** Dedicated music playback screen.
-- **Mini Player:** Compact player component for quick access.
-- **User Profile:** Profile screen.
-- **Theme Support:** Theme management and customizable UI styling.
-- **Reusable Components:** Modular components for track cards, artwork, and player controls.
+- 🎧 **Music Discovery** – Explore and discover songs.
+- 🔍 **Smart Search** – Search for tracks and explore music categories.
+- ▶️ **Music Player** – Play, pause, skip and control playback.
+- ❤️ **Liked Songs** – Save your favourite tracks.
+- 📂 **Playlist Management** – Create, manage and organize playlists.
+- 🌙 **Dark & Light Mode** – Switch between beautiful themes.
+- 👤 **User Profile** – Manage your profile and view listening statistics.
+- 🔐 **Authentication** – Login, signup and password reset screens.
+- 🎨 **Modern UI** – Premium purple and lavender-inspired interface.
+
+## 🖼️ App Screenshots
+
+### 🔐 Authentication
+
+<p align="center">
+  <img src="screenshots/auth.jpeg" width="190" alt="Dhunn Login and Signup" />
+</p>
+
+### 🏠 Home Experience
+
+<p align="center">
+  <img src="screenshots/home-light.jpeg" width="190" alt="Home Light Mode" />
+  <img src="screenshots/home-dark.jpeg" width="190" alt="Home Dark Mode" />
+  <img src="screenshots/home-scroll.jpeg" width="190" alt="Home Scroll View" />
+</p>
+
+### 🔍 Music Discovery
+
+<p align="center">
+  <img src="screenshots/search-categories.jpeg" width="190" alt="Search Categories" />
+  <img src="screenshots/search-results.jpeg" width="190" alt="Search Results" />
+</p>
+
+### ❤️ Your Library
+
+<p align="center">
+  <img src="screenshots/library.jpeg" width="190" alt="Dhunn Library" />
+</p>
+
+### 👤 User Profile
+
+<p align="center">
+  <img src="screenshots/profile.jpeg" width="190" alt="Dhunn Profile" />
+</p>
+
+---
 
 ## 🛠️ Tech Stack
 
-- React Native
-- Expo
-- TypeScript
-- Expo Router
-- React Hooks and Context API
-- JavaScript / TypeScript
-- Git and GitHub
+| Technology        | Purpose                        |
+| ----------------- | ------------------------------ |
+| React Native      | Mobile application development |
+| Expo              | Development and build platform |
+| TypeScript        | Type-safe development          |
+| Expo Router       | File-based navigation          |
+| React Context API | Global state management        |
+| AsyncStorage      | Local data persistence         |
+| Ionicons          | Application icons              |
+| Expo Image Picker | Profile photo selection        |
 
 ## 📁 Project Structure
 
 ```text
 dhunn/
+├── assets/
+│   └── images/
+├── screenshots/
 ├── src/
 │   ├── app/
 │   │   ├── (tabs)/
-│   │   │   ├── _layout.tsx
-│   │   │   ├── index.tsx
-│   │   │   ├── library.tsx
-│   │   │   ├── profile.tsx
-│   │   │   └── search.tsx
+│   │   ├── playlist/
 │   │   ├── login.tsx
 │   │   ├── signup.tsx
-│   │   ├── now-playing.tsx
-│   │   └── playlist/
-│   │       └── [id].tsx
+│   │   ├── forgot-password.tsx
+│   │   └── now-playing.tsx
 │   ├── components/
 │   ├── constants/
 │   ├── context/
 │   ├── hooks/
 │   ├── services/
 │   └── types/
-├── assets/
 ├── app.json
+├── eas.json
 ├── package.json
-├── package-lock.json
 └── README.md
 ```
 
-## 🚀 Getting Started
+## ⚙️ Installation & Setup
 
-### Prerequisites
-
-- Node.js and npm
-- Expo Go or an Android emulator
-- Git
-
-### Installation
-
-1. Clone the repository:
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/soniya1610/dhunn.git
 ```
 
-2. Navigate to the project directory:
+### 2. Navigate to the project
 
 ```bash
 cd dhunn
 ```
 
-3. Install dependencies:
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-4. Start the Expo development server:
+### 4. Start the Expo development server
 
 ```bash
 npx expo start
 ```
 
-5. Run the app using Expo Go or an Android emulator.
+Follow the Expo CLI instructions to run the app on your device or emulator.
 
-## 📱 Android Build
+## 🏗️ Build APK
 
-To create an Android APK using EAS Build:
+To generate an Android APK using EAS Build:
 
 ```bash
-npm install -g eas-cli
-eas login
-eas build:configure
 eas build -p android --profile preview
 ```
-
-## 🔮 Future Improvements
-
-- Enhanced music discovery and recommendations.
-- Improved playlist management.
-- Backend integration for music and user data.
-- Better playback controls and listening experience.
-- Additional personalization options.
 
 ## 👩‍💻 Developer
 
 **Soniya Meena**
 
-GitHub: [@soniya1610](https://github.com/soniya1610)
+- GitHub: [@soniya1610](https://github.com/soniya1610)
+- Project: [Dhunn](https://github.com/soniya1610/dhunn)
 
 ---
 
-⭐ If you like this project, consider giving it a star!
+<p align="center">
+  Made with ❤️ and 🎵
+  <br/>
+  <strong>Dhunn – Feel Every Beat.</strong>
+</p>

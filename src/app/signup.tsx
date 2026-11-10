@@ -1,4 +1,5 @@
 
+import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -11,7 +12,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +26,7 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const background = isDark ? '#100B20' : '#F7EEFF';
   const card = isDark ? '#211832' : '#FFFFFF';
@@ -41,7 +42,6 @@ export default function SignupScreen() {
 
     try {
       const err = await signUp(name.trim(), email.trim(), password);
-
       if (err) setError(err);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -62,7 +62,6 @@ export default function SignupScreen() {
           { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' },
         ]}
       />
-
       <View
         style={[
           styles.orb,
@@ -77,7 +76,7 @@ export default function SignupScreen() {
           styles.container,
           {
             paddingTop: insets.top + 25,
-            paddingBottom: insets.bottom + 35,
+            paddingBottom: insets.bottom + 30,
           },
         ]}
         keyboardShouldPersistTaps="handled"
@@ -86,32 +85,19 @@ export default function SignupScreen() {
       >
         <View style={styles.topLabel}>
           <Ionicons name="sparkles" size={13} color="#DDA4FF" />
-          <Text style={styles.topLabelText}>
-            YOUR SOUND. YOUR MOOD.
-          </Text>
+          <Text style={styles.topLabelText}>YOUR SOUND. YOUR MOOD.</Text>
         </View>
 
         <View style={styles.logoWrap}>
           <View style={styles.logo}>
-            <Ionicons
-              name="musical-notes"
-              size={32}
-              color="#FFFFFF"
-            />
+            <Ionicons name="musical-notes" size={32} color="#FFFFFF" />
           </View>
-
           <View style={styles.logoSparkle}>
-            <Ionicons
-              name="sparkles"
-              size={18}
-              color="#FFD1F1"
-            />
+            <Ionicons name="sparkles" size={18} color="#FFD1F1" />
           </View>
         </View>
 
-        <Text style={[styles.brand, { color: textColor }]}>
-          Dhun
-        </Text>
+        <Text style={[styles.brand, { color: textColor }]}>Dhunn</Text>
 
         <Text style={[styles.heading, { color: textColor }]}>
           Find your{'\n'}music space.
@@ -130,7 +116,6 @@ export default function SignupScreen() {
           <Text style={[styles.formTitle, { color: textColor }]}>
             Create your account
           </Text>
-
           <Text style={[styles.formSubtitle, { color: mutedColor }]}>
             Let's make your listening experience yours.
           </Text>
@@ -138,22 +123,13 @@ export default function SignupScreen() {
           <Text style={[styles.fieldLabel, { color: textColor }]}>
             YOUR NAME
           </Text>
-
           <View
             style={[
               styles.inputWrap,
-              {
-                backgroundColor: inputBackground,
-                borderColor: colors.border,
-              },
+              { backgroundColor: inputBackground, borderColor: colors.border },
             ]}
           >
-            <Ionicons
-              name="person-outline"
-              size={19}
-              color={mutedColor}
-            />
-
+            <Ionicons name="person-outline" size={19} color={mutedColor} />
             <TextInput
               value={name}
               onChangeText={setName}
@@ -168,22 +144,13 @@ export default function SignupScreen() {
           <Text style={[styles.fieldLabel, { color: textColor }]}>
             EMAIL ADDRESS
           </Text>
-
           <View
             style={[
               styles.inputWrap,
-              {
-                backgroundColor: inputBackground,
-                borderColor: colors.border,
-              },
+              { backgroundColor: inputBackground, borderColor: colors.border },
             ]}
           >
-            <Ionicons
-              name="mail-outline"
-              size={19}
-              color={mutedColor}
-            />
-
+            <Ionicons name="mail-outline" size={19} color={mutedColor} />
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -200,14 +167,10 @@ export default function SignupScreen() {
           <Text style={[styles.fieldLabel, { color: textColor }]}>
             PASSWORD
           </Text>
-
           <View
             style={[
               styles.inputWrap,
-              {
-                backgroundColor: inputBackground,
-                borderColor: colors.border,
-              },
+              { backgroundColor: inputBackground, borderColor: colors.border },
             ]}
           >
             <Ionicons
@@ -215,22 +178,26 @@ export default function SignupScreen() {
               size={19}
               color={mutedColor}
             />
-
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder="At least 6 characters"
               placeholderTextColor={mutedColor}
-              secureTextEntry
+              secureTextEntry={!showPassword}
               returnKeyType="done"
               onSubmitEditing={submit}
               style={[styles.input, { color: textColor }]}
             />
+            <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={10}>
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color={mutedColor}
+              />
+            </Pressable>
           </View>
 
-          {error ? (
-            <Text style={styles.error}>{error}</Text>
-          ) : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <Pressable
             onPress={submit}
@@ -244,18 +211,13 @@ export default function SignupScreen() {
             <Text style={styles.buttonText}>
               {busy ? 'Creating account...' : 'Create account'}
             </Text>
-
             {!busy && (
-              <Ionicons
-                name="arrow-forward"
-                size={20}
-                color="#FFFFFF"
-              />
+              <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
             )}
           </Pressable>
 
           <Text style={[styles.switchText, { color: mutedColor }]}>
-            Already part of Dhun?{' '}
+            Already part of Dhunn?{' '}
             <Link href="/login" style={styles.link}>
               Sign in
             </Link>
@@ -263,12 +225,7 @@ export default function SignupScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Ionicons
-            name="headset-outline"
-            size={15}
-            color={mutedColor}
-          />
-
+          <Ionicons name="headset-outline" size={15} color={mutedColor} />
           <Text style={[styles.footerText, { color: mutedColor }]}>
             Your songs and playlists stay on this phone.
           </Text>
@@ -308,7 +265,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 30,
-    backgroundColor: 'rgba(173, 103, 225, 0.16)',
+    backgroundColor: 'rgba(173,103,225,0.16)',
   },
   topLabelText: {
     color: '#DDA4FF',
@@ -341,7 +298,7 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 21,
-    fontWeight: '800',
+    fontWeight: '900',
     marginTop: 15,
     letterSpacing: 1,
   },
@@ -361,7 +318,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     width: '100%',
-    borderRadius: 28,
+    borderRadius: 27,
     borderWidth: 1,
     padding: 22,
     shadowColor: '#000000',
@@ -372,7 +329,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   formSubtitle: {
     fontSize: 12,

@@ -29,23 +29,16 @@ export default function MiniPlayer({ bottom }: { bottom: number }) {
     >
       <Artwork
         uri={current.artwork}
-        size={44}
-        radius={10}
+        size={46}
+        radius={12}
         seed={current.title}
       />
 
       <View style={styles.info}>
-        <Text
-          numberOfLines={1}
-          style={[styles.title, { color: colors.text }]}
-        >
+        <Text numberOfLines={1} style={[styles.title, { color: colors.text }]}>
           {current.title}
         </Text>
-
-        <Text
-          numberOfLines={1}
-          style={[styles.artist, { color: colors.muted }]}
-        >
+        <Text numberOfLines={1} style={[styles.artist, { color: colors.muted }]}>
           {current.artist}
         </Text>
       </View>
@@ -58,8 +51,8 @@ export default function MiniPlayer({ bottom }: { bottom: number }) {
       >
         <Ionicons
           name={isPlaying ? 'pause' : 'play'}
-          size={25}
-          color={colors.text}
+          size={23}
+          color={colors.accent}
         />
       </Pressable>
 
@@ -69,11 +62,7 @@ export default function MiniPlayer({ bottom }: { bottom: number }) {
         accessibilityLabel="Next song"
         style={styles.control}
       >
-        <Ionicons
-          name="play-forward"
-          size={23}
-          color={colors.text}
-        />
+        <Ionicons name="play-forward" size={22} color={colors.text} />
       </Pressable>
     </Pressable>
   );
@@ -82,30 +71,35 @@ export default function MiniPlayer({ bottom }: { bottom: number }) {
 const styles = StyleSheet.create({
   bar: {
     position: 'absolute',
-    left: 10,
-    right: 10,
-    height: 68,
+    left: 12,
+    right: 12,
+    height: 70,
     borderWidth: 1,
-    borderRadius: 17,
+    borderRadius: 19,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     paddingHorizontal: 12,
-    elevation: 8,
+    elevation: 10,
+    shadowColor: '#000000',
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
   },
   info: {
     flex: 1,
   },
   title: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   artist: {
     fontSize: 11,
-    marginTop: 3,
+    marginTop: 4,
   },
   control: {
-    padding: 4,
+    width: 34,
+    height: 38,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -24,11 +24,30 @@ export default function TrackRow({ track, queue, onRemove }: Props) {
   return (
     <Pressable
       onPress={() => play(track, queue)}
-      style={[styles.row, { borderBottomColor: colors.border }]}
+      style={[
+        styles.row,
+        {
+          backgroundColor: active
+            ? 'rgba(173,130,255,0.07)'
+            : 'transparent',
+          borderBottomColor: colors.border,
+        },
+      ]}
       accessibilityRole="button"
       accessibilityLabel={`Play ${track.title} by ${track.artist}`}
     >
-      <Artwork uri={track.artwork} size={52} seed={track.title} />
+      <View style={styles.artworkWrap}>
+        <Artwork uri={track.artwork} size={54} radius={13} seed={track.title} />
+        {active && (
+          <View style={styles.activeIndicator}>
+            <Ionicons
+              name="volume-high"
+              size={15}
+              color="#FFFFFF"
+            />
+          </View>
+        )}
+      </View>
 
       <View style={styles.info}>
         <Text
@@ -54,10 +73,11 @@ export default function TrackRow({ track, queue, onRemove }: Props) {
           onPress={onRemove}
           hitSlop={10}
           accessibilityLabel="Remove from playlist"
+          style={styles.action}
         >
           <Ionicons
             name="close-circle-outline"
-            size={24}
+            size={22}
             color={colors.muted}
           />
         </Pressable>
@@ -67,6 +87,7 @@ export default function TrackRow({ track, queue, onRemove }: Props) {
         onPress={() => toggleLike(track)}
         hitSlop={10}
         accessibilityLabel={liked ? 'Unlike song' : 'Like song'}
+        style={styles.action}
       >
         <Ionicons
           name={liked ? 'heart' : 'heart-outline'}
@@ -82,19 +103,39 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    paddingVertical: 10,
+    gap: 13,
+    paddingVertical: 11,
+    paddingHorizontal: 5,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+  },
+  artworkWrap: {
+    position: 'relative',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    borderRadius: 13,
+    backgroundColor: 'rgba(75,42,120,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   info: {
     flex: 1,
   },
   title: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '800',
   },
   artist: {
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  action: {
+    paddingHorizontal: 3,
+    paddingVertical: 5,
   },
 });

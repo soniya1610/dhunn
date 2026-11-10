@@ -22,14 +22,18 @@ export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors } = useTheme();
-
   const { liked, playlists, createPlaylist, deletePlaylist } = useLibrary();
 
   const [showNew, setShowNew] = useState(false);
   const [name, setName] = useState('');
 
   const create = () => {
-    createPlaylist(name);
+    if (!name.trim()) {
+      Alert.alert('Playlist name required', 'Enter a name for your playlist.');
+      return;
+    }
+
+    createPlaylist(name.trim());
     setName('');
     setShowNew(false);
   };
@@ -46,38 +50,48 @@ export default function LibraryScreen() {
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + 16,
+          paddingTop: insets.top + 18,
           paddingHorizontal: 20,
-          paddingBottom: 160,
+          paddingBottom: 170,
         }}
       >
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Library
-          </Text>
+          <View>
+            <Text style={[styles.eyebrow, { color: colors.accent }]}>
+              YOUR COLLECTION
+            </Text>
+            <Text style={[styles.title, { color: colors.text }]}>
+              Library
+            </Text>
+          </View>
 
           <Pressable
             onPress={() => setShowNew(true)}
-            hitSlop={10}
+            style={[styles.addButton, { backgroundColor: colors.surface }]}
             accessibilityRole="button"
             accessibilityLabel="Create playlist"
           >
-            <Ionicons name="add-circle" size={34} color={colors.accent} />
+            <Ionicons name="add" size={27} color={colors.accent} />
           </Pressable>
         </View>
 
         <Pressable
           onPress={() => router.push('/playlist/liked')}
-          style={[styles.row, { borderBottomColor: colors.border }]}
+          style={[
+            styles.likedCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
           accessibilityRole="button"
         >
-          <View style={[styles.likedArt, { backgroundColor: colors.accent }]}>
-            <Ionicons name="heart" size={26} color="#fff" />
+          <View style={styles.likedArt}>
+            <Ionicons name="heart" size={28} color="#FFFFFF" />
           </View>
 
           <View style={{ flex: 1 }}>
@@ -89,31 +103,62 @@ export default function LibraryScreen() {
             </Text>
           </View>
 
-          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+          <Ionicons name="chevron-forward" size={21} color={colors.muted} />
         </Pressable>
 
-        <Text style={[styles.section, { color: colors.text }]}>
-          Playlists
-        </Text>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.section, { color: colors.text }]}>
+            Your Playlists
+          </Text>
+          <Text style={[styles.total, { color: colors.muted }]}>
+            {playlists.length} playlists
+          </Text>
+        </View>
 
         {playlists.length === 0 ? (
-          <StateMessage text="No playlists yet. Tap + to create your first one." />
+          <View
+            style={[
+              styles.emptyCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons name="albums-outline" size={38} color={colors.accent} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              Your playlists live here
+            </Text>
+            <Text style={[styles.emptyText, { color: colors.muted }]}>
+              Create your first playlist and collect your favourite songs.
+            </Text>
+            <Pressable
+              onPress={() => setShowNew(true)}
+              style={[styles.createEmpty, { backgroundColor: colors.accent }]}
+            >
+              <Text style={styles.createEmptyText}>Create playlist</Text>
+            </Pressable>
+          </View>
         ) : (
           playlists.map((p) => (
             <Pressable
               key={p.id}
               onPress={() => router.push(`/playlist/${p.id}`)}
-              style={[styles.row, { borderBottomColor: colors.border }]}
+              style={[
+                styles.playlistRow,
+                { borderBottomColor: colors.border },
+              ]}
               accessibilityRole="button"
             >
               <Artwork
                 uri={p.tracks[0]?.artwork}
-                size={56}
+                size={60}
+                radius={14}
                 seed={p.name}
               />
 
               <View style={{ flex: 1 }}>
-                <Text style={[styles.name, { color: colors.text }]}>
+                <Text numberOfLines={1} style={[styles.name, { color: colors.text }]}>
                   {p.name}
                 </Text>
                 <Text style={[styles.count, { color: colors.muted }]}>
@@ -123,15 +168,14 @@ export default function LibraryScreen() {
 
               <Pressable
                 onPress={() => confirmDelete(p.id, p.name)}
-                hitSlop={10}
+                hitSlop={12}
                 accessibilityLabel={`Delete ${p.name}`}
+                style={styles.deleteButton}
               >
-                <Ionicons
-                  name="trash-outline"
-                  size={22}
-                  color={colors.muted}
-                />
+                <Ionicons name="trash-outline" size={20} color={colors.muted} />
               </Pressable>
+
+              <Ionicons name="chevron-forward" size={19} color={colors.muted} />
             </Pressable>
           ))
         )}
@@ -145,10 +189,20 @@ export default function LibraryScreen() {
       >
         <View style={styles.modalBackdrop}>
           <View
-            style={[styles.modalBox, { backgroundColor: colors.surface }]}
+            style={[
+              styles.modalBox,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
           >
+            <View style={styles.modalIcon}>
+              <Ionicons name="albums-outline" size={25} color={colors.accent} />
+            </View>
+
             <Text style={[styles.modalTitle, { color: colors.text }]}>
               New playlist
+            </Text>
+            <Text style={[styles.modalSubtitle, { color: colors.muted }]}>
+              Give your collection a name.
             </Text>
 
             <TextInput
@@ -165,13 +219,12 @@ export default function LibraryScreen() {
                 },
               ]}
               autoFocus
+              maxLength={40}
+              onSubmitEditing={create}
             />
 
             <View style={styles.modalActions}>
-              <Pressable
-                onPress={() => setShowNew(false)}
-                accessibilityRole="button"
-              >
+              <Pressable onPress={() => setShowNew(false)}>
                 <Text style={[styles.cancel, { color: colors.muted }]}>
                   Cancel
                 </Text>
@@ -180,7 +233,6 @@ export default function LibraryScreen() {
               <Pressable
                 onPress={create}
                 style={[styles.createBtn, { backgroundColor: colors.accent }]}
-                accessibilityRole="button"
               >
                 <Text style={styles.createText}>Create</Text>
               </Pressable>
@@ -200,81 +252,159 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 25,
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+    marginBottom: 5,
   },
   title: {
     fontSize: 34,
-    fontWeight: '800',
+    fontWeight: '900',
+    letterSpacing: -1,
   },
-  section: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginTop: 24,
-    marginBottom: 4,
+  addButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(173,130,255,0.2)',
   },
-  row: {
+  likedCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 15,
+    padding: 15,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   likedArt: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
+    width: 60,
+    height: 60,
+    borderRadius: 15,
+    backgroundColor: '#8552D8',
     alignItems: 'center',
     justifyContent: 'center',
   },
   name: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '800',
   },
   count: {
+    fontSize: 12,
+    marginTop: 5,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 12,
+  },
+  section: {
+    fontSize: 19,
+    fontWeight: '800',
+  },
+  total: {
+    fontSize: 12,
+  },
+  emptyCard: {
+    alignItems: 'center',
+    padding: 25,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginTop: 5,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 13,
+  },
+  emptyText: {
     fontSize: 13,
-    marginTop: 3,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginTop: 7,
+  },
+  createEmpty: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 13,
+    marginTop: 18,
+  },
+  createEmptyText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  playlistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 13,
+    paddingVertical: 13,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  deleteButton: {
+    padding: 5,
   },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: 'rgba(5,3,12,0.78)',
     justifyContent: 'center',
-    padding: 28,
+    padding: 25,
   },
   modalBox: {
-    borderRadius: 18,
-    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    padding: 22,
+  },
+  modalIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    backgroundColor: 'rgba(173,130,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 14,
+    fontSize: 21,
+    fontWeight: '900',
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    marginTop: 5,
+    marginBottom: 20,
   },
   modalInput: {
-    height: 46,
-    borderRadius: 12,
+    height: 50,
+    borderRadius: 13,
     borderWidth: 1,
     paddingHorizontal: 14,
-    fontSize: 16,
+    fontSize: 15,
   },
   modalActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 20,
-    marginTop: 18,
+    gap: 22,
+    marginTop: 22,
   },
   cancel: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
   },
   createBtn: {
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 22,
+    paddingVertical: 12,
   },
   createText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '800',
   },
 });

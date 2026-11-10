@@ -37,7 +37,7 @@ export default function PlaylistScreen() {
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingTop: insets.top + 8,
+          paddingTop: insets.top + 10,
         },
       ]}
     >
@@ -47,37 +47,67 @@ export default function PlaylistScreen() {
         hitSlop={12}
         accessibilityLabel="Go back"
       >
-        <Ionicons name="chevron-back" size={28} color={colors.accent} />
+        <Ionicons name="chevron-back" size={25} color={colors.accent} />
         <Text style={[styles.backText, { color: colors.accent }]}>
           Library
         </Text>
       </Pressable>
 
-      <Text style={[styles.title, { color: colors.text }]}>
-        {title}
-      </Text>
-
-      <Text style={[styles.count, { color: colors.muted }]}>
-        {tracks.length} songs
-      </Text>
-
-      <Pressable
-        onPress={() => tracks[0] && play(tracks[0], tracks)}
-        disabled={tracks.length === 0}
+      <View
         style={[
-          styles.playAll,
-          { backgroundColor: colors.accent },
-          tracks.length === 0 && { opacity: 0.4 },
+          styles.hero,
+          { backgroundColor: colors.surface, borderColor: colors.border },
         ]}
-        accessibilityRole="button"
       >
-        <Ionicons name="play" size={20} color="#fff" />
-        <Text style={styles.playAllText}>Play all</Text>
-      </Pressable>
+        <View
+          style={[
+            styles.heroIcon,
+            { backgroundColor: isLikedList ? '#8552D8' : '#573A8A' },
+          ]}
+        >
+          <Ionicons
+            name={isLikedList ? 'heart' : 'musical-notes'}
+            size={38}
+            color="#FFFFFF"
+          />
+        </View>
+
+        <Text numberOfLines={2} style={[styles.title, { color: colors.text }]}>
+          {title}
+        </Text>
+
+        <Text style={[styles.count, { color: colors.muted }]}>
+          {tracks.length} songs
+        </Text>
+
+        <Pressable
+          onPress={() => tracks[0] && play(tracks[0], tracks)}
+          disabled={tracks.length === 0}
+          style={[
+            styles.playAll,
+            { backgroundColor: colors.accent },
+            tracks.length === 0 && { opacity: 0.4 },
+          ]}
+          accessibilityRole="button"
+        >
+          <Ionicons name="play" size={19} color="#FFFFFF" />
+          <Text style={styles.playAllText}>Play all</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.listHeader}>
+        <Text style={[styles.listTitle, { color: colors.text }]}>
+          All tracks
+        </Text>
+        <Text style={[styles.count, { color: colors.muted }]}>
+          {tracks.length} songs
+        </Text>
+      </View>
 
       <FlatList
         data={tracks}
         keyExtractor={(t) => t.id}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 60 }}
         renderItem={({ item }) => (
           <TrackRow
@@ -112,32 +142,61 @@ const styles = StyleSheet.create({
   back: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: -8,
+    marginLeft: -7,
+    height: 40,
   },
   backText: {
-    fontSize: 17,
+    fontSize: 15,
+    fontWeight: '700',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
+  hero: {
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 22,
+    borderWidth: 1,
     marginTop: 12,
   },
+  heroIcon: {
+    width: 84,
+    height: 84,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
   count: {
-    fontSize: 14,
-    marginTop: 2,
+    fontSize: 12,
+    marginTop: 6,
   },
   playAll: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    height: 46,
-    borderRadius: 12,
-    marginVertical: 16,
+    gap: 9,
+    height: 47,
+    width: '100%',
+    borderRadius: 14,
+    marginTop: 20,
   },
   playAllText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 25,
+    marginBottom: 7,
+  },
+  listTitle: {
+    fontSize: 17,
+    fontWeight: '800',
   },
 });

@@ -1,4 +1,5 @@
 
+import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -11,7 +12,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +26,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const background = isDark ? '#100B20' : '#F7EEFF';
   const card = isDark ? '#211832' : '#FFFFFF';
@@ -41,7 +42,6 @@ export default function LoginScreen() {
 
     try {
       const err = await signIn(email.trim(), password);
-
       if (err) setError(err);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -62,7 +62,6 @@ export default function LoginScreen() {
           { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' },
         ]}
       />
-
       <View
         style={[
           styles.orb,
@@ -76,8 +75,8 @@ export default function LoginScreen() {
         contentContainerStyle={[
           styles.container,
           {
-            paddingTop: insets.top + 35,
-            paddingBottom: insets.bottom + 35,
+            paddingTop: insets.top + 30,
+            paddingBottom: insets.bottom + 30,
           },
         ]}
         keyboardShouldPersistTaps="handled"
@@ -86,32 +85,19 @@ export default function LoginScreen() {
       >
         <View style={styles.topLabel}>
           <Ionicons name="sparkles" size={13} color="#DDA4FF" />
-          <Text style={styles.topLabelText}>
-            YOUR SOUND. YOUR MOOD.
-          </Text>
+          <Text style={styles.topLabelText}>YOUR SOUND. YOUR MOOD.</Text>
         </View>
 
         <View style={styles.logoWrap}>
           <View style={styles.logo}>
-            <Ionicons
-              name="musical-notes"
-              size={34}
-              color="#FFFFFF"
-            />
+            <Ionicons name="musical-notes" size={34} color="#FFFFFF" />
           </View>
-
           <View style={styles.logoSparkle}>
-            <Ionicons
-              name="sparkles"
-              size={18}
-              color="#FFD1F1"
-            />
+            <Ionicons name="sparkles" size={18} color="#FFD1F1" />
           </View>
         </View>
 
-        <Text style={[styles.brand, { color: textColor }]}>
-          Dhun
-        </Text>
+        <Text style={[styles.brand, { color: textColor }]}>Dhunn</Text>
 
         <Text style={[styles.heading, { color: textColor }]}>
           Welcome{'\n'}back.
@@ -130,7 +116,6 @@ export default function LoginScreen() {
           <Text style={[styles.formTitle, { color: textColor }]}>
             Sign in to your world
           </Text>
-
           <Text style={[styles.formSubtitle, { color: mutedColor }]}>
             Pick up right where the music left off.
           </Text>
@@ -138,18 +123,13 @@ export default function LoginScreen() {
           <Text style={[styles.fieldLabel, { color: textColor }]}>
             EMAIL ADDRESS
           </Text>
-
           <View
             style={[
               styles.inputWrap,
-              {
-                backgroundColor: inputBackground,
-                borderColor: colors.border,
-              },
+              { backgroundColor: inputBackground, borderColor: colors.border },
             ]}
           >
             <Ionicons name="mail-outline" size={19} color={mutedColor} />
-
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -166,14 +146,10 @@ export default function LoginScreen() {
           <Text style={[styles.fieldLabel, { color: textColor }]}>
             PASSWORD
           </Text>
-
           <View
             style={[
               styles.inputWrap,
-              {
-                backgroundColor: inputBackground,
-                borderColor: colors.border,
-              },
+              { backgroundColor: inputBackground, borderColor: colors.border },
             ]}
           >
             <Ionicons
@@ -181,31 +157,33 @@ export default function LoginScreen() {
               size={19}
               color={mutedColor}
             />
-
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
               placeholderTextColor={mutedColor}
-              secureTextEntry
+              secureTextEntry={!showPassword}
               returnKeyType="done"
               onSubmitEditing={submit}
               style={[styles.input, { color: textColor }]}
             />
+            <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={10}>
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color={mutedColor}
+              />
+            </Pressable>
           </View>
 
           <Pressable
             onPress={() => router.push('/forgot-password')}
             style={styles.forgotButton}
           >
-            <Text style={styles.forgotText}>
-              Forgot password?
-            </Text>
+            <Text style={styles.forgotText}>Forgot password?</Text>
           </Pressable>
 
-          {error ? (
-            <Text style={styles.error}>{error}</Text>
-          ) : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <Pressable
             onPress={submit}
@@ -219,18 +197,13 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>
               {busy ? 'Signing in...' : 'Let me in'}
             </Text>
-
             {!busy && (
-              <Ionicons
-                name="arrow-forward"
-                size={20}
-                color="#FFFFFF"
-              />
+              <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
             )}
           </Pressable>
 
           <Text style={[styles.switchText, { color: mutedColor }]}>
-            New to Dhun?{' '}
+            New to Dhunn?{' '}
             <Link href="/signup" style={styles.link}>
               Create an account
             </Link>
@@ -238,12 +211,7 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Ionicons
-            name="headset-outline"
-            size={15}
-            color={mutedColor}
-          />
-
+          <Ionicons name="headset-outline" size={15} color={mutedColor} />
           <Text style={[styles.footerText, { color: mutedColor }]}>
             Made for the moments that matter.
           </Text>
@@ -283,7 +251,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 30,
-    backgroundColor: 'rgba(173, 103, 225, 0.16)',
+    backgroundColor: 'rgba(173,103,225,0.16)',
   },
   topLabelText: {
     color: '#DDA4FF',
@@ -292,7 +260,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   logoWrap: {
-    marginTop: 35,
+    marginTop: 30,
     position: 'relative',
   },
   logo: {
@@ -316,8 +284,8 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 22,
-    fontWeight: '800',
-    marginTop: 18,
+    fontWeight: '900',
+    marginTop: 17,
     letterSpacing: 1,
   },
   heading: {
@@ -325,18 +293,18 @@ const styles = StyleSheet.create({
     lineHeight: 49,
     fontWeight: '900',
     textAlign: 'center',
-    marginTop: 13,
+    marginTop: 12,
     letterSpacing: -1.5,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 28,
+    marginTop: 9,
+    marginBottom: 25,
   },
   formCard: {
     width: '100%',
-    borderRadius: 28,
+    borderRadius: 27,
     borderWidth: 1,
     padding: 22,
     shadowColor: '#000000',
@@ -347,12 +315,12 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   formSubtitle: {
     fontSize: 12,
     marginTop: 6,
-    marginBottom: 25,
+    marginBottom: 23,
   },
   fieldLabel: {
     fontSize: 10,
@@ -367,7 +335,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 19,
+    marginBottom: 18,
   },
   input: {
     flex: 1,
@@ -377,7 +345,7 @@ const styles = StyleSheet.create({
   },
   forgotButton: {
     alignSelf: 'flex-end',
-    marginTop: -9,
+    marginTop: -8,
     marginBottom: 16,
     paddingVertical: 5,
   },
@@ -414,7 +382,7 @@ const styles = StyleSheet.create({
   switchText: {
     textAlign: 'center',
     fontSize: 13,
-    marginTop: 23,
+    marginTop: 22,
   },
   link: {
     color: '#B875F5',
@@ -424,7 +392,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
-    marginTop: 27,
+    marginTop: 25,
   },
   footerText: {
     fontSize: 11,

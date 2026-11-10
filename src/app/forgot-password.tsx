@@ -13,11 +13,15 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { resetPassword } = useAuth();
+  const { colors } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,7 +36,10 @@ export default function ForgotPasswordScreen() {
     }
 
     if (password.length < 6) {
-      Alert.alert('Invalid password', 'Password must contain at least 6 characters.');
+      Alert.alert(
+        'Invalid password',
+        'Password must contain at least 6 characters.',
+      );
       return;
     }
 
@@ -44,7 +51,7 @@ export default function ForgotPasswordScreen() {
     try {
       setLoading(true);
 
-      const error = await resetPassword(email, password);
+      const error = await resetPassword(email.trim(), password);
 
       if (error) {
         Alert.alert('Reset failed', error);
@@ -54,7 +61,7 @@ export default function ForgotPasswordScreen() {
       Alert.alert(
         'Password updated',
         'Your password has been changed successfully.',
-        [{ text: 'Go to Login', onPress: () => router.replace('/login') }]
+        [{ text: 'Go to Login', onPress: () => router.replace('/login') }],
       );
     } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
@@ -63,74 +70,116 @@ export default function ForgotPasswordScreen() {
     }
   };
 
+  const inputStyle = [
+    styles.inputContainer,
+    {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+  ];
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: insets.top + 15,
+            paddingBottom: insets.bottom + 30,
+          },
+        ]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
       >
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={23} color="#FFFFFF" />
+        <Pressable
+          style={[styles.backButton, { backgroundColor: colors.surface }]}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={22} color={colors.text} />
         </Pressable>
 
         <View style={styles.content}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="lock-open-outline" size={38} color="#B58CFF" />
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: 'rgba(173,130,255,0.15)' },
+            ]}
+          >
+            <Ionicons name="lock-open-outline" size={37} color={colors.accent} />
           </View>
 
-          <Text style={styles.title}>Reset Password</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.eyebrow, { color: colors.accent }]}>
+            ACCOUNT RECOVERY
+          </Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            Reset Password
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
             Enter your registered email and create a new password.
           </Text>
 
-          <Text style={styles.label}>Email Address</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#A9A0B8" />
+          <Text style={[styles.label, { color: colors.text }]}>
+            EMAIL ADDRESS
+          </Text>
+          <View style={inputStyle}>
+            <Ionicons name="mail-outline" size={20} color={colors.muted} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               placeholder="Enter your registered email"
-              placeholderTextColor="#817A90"
+              placeholderTextColor={colors.muted}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
               returnKeyType="next"
             />
           </View>
 
-          <Text style={styles.label}>New Password</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#A9A0B8" />
+          <Text style={[styles.label, { color: colors.text }]}>
+            NEW PASSWORD
+          </Text>
+          <View style={inputStyle}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={colors.muted}
+            />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               placeholder="Enter new password"
-              placeholderTextColor="#817A90"
+              placeholderTextColor={colors.muted}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               returnKeyType="next"
             />
-            <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Pressable onPress={() => setShowPassword((v) => !v)}>
               <Ionicons
                 name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={21}
-                color="#A9A0B8"
+                color={colors.muted}
               />
             </Pressable>
           </View>
 
-          <Text style={styles.label}>Confirm Password</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#A9A0B8" />
+          <Text style={[styles.label, { color: colors.text }]}>
+            CONFIRM PASSWORD
+          </Text>
+          <View style={inputStyle}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={colors.muted}
+            />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               placeholder="Confirm new password"
-              placeholderTextColor="#817A90"
+              placeholderTextColor={colors.muted}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showPassword}
@@ -140,20 +189,29 @@ export default function ForgotPasswordScreen() {
           </View>
 
           <Pressable
-            style={[styles.resetButton, loading && styles.disabledButton]}
+            style={[
+              styles.resetButton,
+              { backgroundColor: colors.accent },
+              loading && styles.disabledButton,
+            ]}
             onPress={handleReset}
             disabled={loading}
           >
             <Text style={styles.resetButtonText}>
               {loading ? 'Updating...' : 'Reset Password'}
             </Text>
+            {!loading && (
+              <Ionicons name="arrow-forward" size={19} color="#FFFFFF" />
+            )}
           </Pressable>
 
           <Pressable
             style={styles.loginButton}
             onPress={() => router.replace('/login')}
           >
-            <Text style={styles.loginText}>Back to Login</Text>
+            <Text style={[styles.loginText, { color: colors.accent }]}>
+              Back to Login
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -164,19 +222,15 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#100C1B',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 25,
-    paddingTop: 55,
-    paddingBottom: 35,
+    paddingHorizontal: 24,
   },
   backButton: {
-    width: 42,
-    height: 42,
+    width: 43,
+    height: 43,
     borderRadius: 14,
-    backgroundColor: '#241B35',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -189,36 +243,37 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 23,
-    backgroundColor: '#2B2042',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 25,
+    marginBottom: 22,
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.8,
+    marginBottom: 8,
   },
   title: {
-    color: '#FFFFFF',
     fontSize: 29,
-    fontWeight: '700',
+    fontWeight: '900',
     marginBottom: 10,
   },
   subtitle: {
-    color: '#A9A0B8',
-    fontSize: 14,
-    lineHeight: 22,
-    marginBottom: 30,
+    fontSize: 13,
+    lineHeight: 21,
+    marginBottom: 25,
   },
   label: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
     marginBottom: 9,
-    marginTop: 17,
+    marginTop: 16,
   },
   inputContainer: {
-    height: 55,
-    borderRadius: 14,
-    backgroundColor: '#211A30',
+    minHeight: 54,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#382C4D',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
@@ -226,33 +281,32 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#FFFFFF',
-    fontSize: 14,
-    height: '100%',
+    fontSize: 13,
+    height: 54,
   },
   resetButton: {
-    height: 55,
-    borderRadius: 15,
-    backgroundColor: '#9561E9',
+    minHeight: 55,
+    borderRadius: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 30,
+    gap: 10,
+    marginTop: 28,
   },
   disabledButton: {
     opacity: 0.6,
   },
   resetButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
   },
   loginButton: {
     alignItems: 'center',
     padding: 18,
   },
   loginText: {
-    color: '#B58CFF',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '800',
   },
 });

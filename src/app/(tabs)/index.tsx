@@ -23,11 +23,66 @@ import { searchTracks } from '../../services/api';
 import { Track } from '../../types';
 
 const moods = [
-  { name: 'Chill', icon: 'cloudy-night-outline' as const, query: 'lofi chill' },
-  { name: 'Romantic', icon: 'heart-outline' as const, query: 'romantic hindi songs' },
-  { name: 'Focus', icon: 'headset-outline' as const, query: 'focus music' },
-  { name: 'Energy', icon: 'flash-outline' as const, query: 'energetic hindi songs' },
+  {
+    name: 'Chill',
+    icon: 'cloudy-night-outline' as const,
+    query: 'lofi chill',
+  },
+  {
+    name: 'Romantic',
+    icon: 'heart-outline' as const,
+    query: 'romantic hindi songs',
+  },
+  {
+    name: 'Focus',
+    icon: 'headset-outline' as const,
+    query: 'focus music',
+  },
+  {
+    name: 'Energy',
+    icon: 'flash-outline' as const,
+    query: 'energetic hindi songs',
+  },
 ];
+
+function SectionHeading({
+  title,
+  subtitle,
+  colors,
+}: {
+  title: string;
+  subtitle?: string;
+  colors: ReturnType<typeof useTheme>['colors'];
+}) {
+  return (
+    <View style={styles.sectionHeading}>
+      <View style={{ flex: 1 }}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {title}
+        </Text>
+
+        {subtitle ? (
+          <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+
+      <View
+        style={[
+          styles.headingDecoration,
+          { backgroundColor: colors.surface },
+        ]}
+      >
+        <Ionicons
+          name="sparkles"
+          size={17}
+          color={colors.accent}
+        />
+      </View>
+    </View>
+  );
+}
 
 function Row({
   title,
@@ -44,18 +99,11 @@ function Row({
 
   return (
     <View style={styles.sectionContainer}>
-      <View style={styles.sectionHeader}>
-        <View>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            {title}
-          </Text>
-          {subtitle ? (
-            <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
-              {subtitle}
-            </Text>
-          ) : null}
-        </View>
-      </View>
+      <SectionHeading
+        title={title}
+        subtitle={subtitle}
+        colors={colors}
+      />
 
       <FlatList
         data={tracks}
@@ -119,18 +167,52 @@ export default function HomeScreen() {
 
   const firstName = user?.name.split(' ')[0] ?? '';
 
+  const featuredBackground = isDark
+    ? '#302044'
+    : '#E8D9FF';
+
+  const featuredText = isDark
+    ? '#FFFFFF'
+    : '#28183D';
+
+  const featuredMuted = isDark
+    ? '#D6C4EF'
+    : '#665080';
+
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         paddingTop: insets.top + 14,
-        paddingBottom: 160,
+        paddingBottom: 155,
       }}
     >
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerInfo}>
+          <View style={styles.brandRow}>
+            <View
+              style={[
+                styles.brandIcon,
+                { backgroundColor: colors.surface },
+              ]}
+            >
+              <Ionicons
+                name="musical-note"
+                size={16}
+                color={colors.accent}
+              />
+            </View>
+
+            <Text style={[styles.brandName, { color: colors.text }]}>
+              dhunn
+            </Text>
+          </View>
+
           <Text style={[styles.greeting, { color: colors.accent }]}>
             {greeting} ✨
           </Text>
@@ -157,7 +239,7 @@ export default function HomeScreen() {
           >
             <Ionicons
               name={isDark ? 'sunny-outline' : 'moon-outline'}
-              size={21}
+              size={20}
               color={colors.accent}
             />
           </Pressable>
@@ -171,7 +253,10 @@ export default function HomeScreen() {
             ]}
           >
             {user?.photo ? (
-              <Image source={{ uri: user.photo }} style={styles.avatar} />
+              <Image
+                source={{ uri: user.photo }}
+                style={styles.avatar}
+              />
             ) : (
               <View
                 style={[
@@ -179,7 +264,12 @@ export default function HomeScreen() {
                   { backgroundColor: colors.surface },
                 ]}
               >
-                <Text style={[styles.avatarText, { color: colors.accent }]}>
+                <Text
+                  style={[
+                    styles.avatarText,
+                    { color: colors.accent },
+                  ]}
+                >
                   {firstName.charAt(0).toUpperCase()}
                 </Text>
               </View>
@@ -190,18 +280,32 @@ export default function HomeScreen() {
 
       {/* FEATURED MIX */}
       <View style={styles.sectionContainer}>
-        <View style={styles.sectionHeader}>
+        <View style={styles.featuredHeading}>
           <View>
-            <Text style={[styles.eyebrow, { color: colors.accent }]}>
+            <Text
+              style={[
+                styles.eyebrow,
+                { color: colors.accent },
+              ]}
+            >
               YOUR DAILY SOUNDTRACK
             </Text>
 
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: colors.text },
+              ]}
+            >
               Made for this moment
             </Text>
           </View>
 
-          <Ionicons name="sparkles" size={22} color={colors.accent} />
+          <Ionicons
+            name="sparkles"
+            size={22}
+            color={colors.accent}
+          />
         </View>
 
         <Pressable
@@ -209,7 +313,7 @@ export default function HomeScreen() {
           disabled={picks.length === 0}
           style={[
             styles.featured,
-            { backgroundColor: isDark ? '#8F392C' : '#F3C9B8' },
+            { backgroundColor: featuredBackground },
           ]}
           accessibilityRole="button"
           accessibilityLabel="Play Evening Drive"
@@ -217,28 +321,50 @@ export default function HomeScreen() {
           <View
             style={[
               styles.featuredGlow,
-              { backgroundColor: isDark ? '#C65B43' : '#E8A48B' },
+              {
+                backgroundColor: isDark
+                  ? '#7551A9'
+                  : '#C2A2F2',
+              },
+            ]}
+          />
+
+          <View
+            style={[
+              styles.featuredGlowSmall,
+              {
+                backgroundColor: isDark
+                  ? '#A17ACF'
+                  : '#D4BDF5',
+              },
             ]}
           />
 
           <View style={styles.featuredTop}>
             <View style={styles.tag}>
-              <Ionicons name="radio" size={12} color="#FFFFFF" />
-              <Text style={styles.tagText}>DHUN MIX</Text>
+              <Ionicons
+                name="radio"
+                size={12}
+                color="#FFFFFF"
+              />
+
+              <Text style={styles.tagText}>DHUN EXCLUSIVE</Text>
             </View>
 
-            <Ionicons
-              name="musical-notes"
-              size={25}
-              color={isDark ? '#FFE0D3' : '#713B2C'}
-            />
+            <View style={styles.musicIconCircle}>
+              <Ionicons
+                name="musical-notes"
+                size={23}
+                color={featuredText}
+              />
+            </View>
           </View>
 
-          <View>
+          <View style={styles.featuredContent}>
             <Text
               style={[
                 styles.featuredSmall,
-                { color: isDark ? '#FFE0D3' : '#713B2C' },
+                { color: featuredMuted },
               ]}
             >
               A LITTLE MUSIC, A LOT OF FEELING
@@ -247,7 +373,7 @@ export default function HomeScreen() {
             <Text
               style={[
                 styles.featuredTitle,
-                { color: isDark ? '#FFFFFF' : '#38231E' },
+                { color: featuredText },
               ]}
             >
               Evening{'\n'}Drive.
@@ -256,7 +382,7 @@ export default function HomeScreen() {
             <Text
               style={[
                 styles.featuredSub,
-                { color: isDark ? '#FFE0D3' : '#713B2C' },
+                { color: featuredMuted },
               ]}
             >
               {picks.length
@@ -265,8 +391,15 @@ export default function HomeScreen() {
             </Text>
 
             <View style={styles.playButton}>
-              <Ionicons name="play" size={18} color="#171719" />
-              <Text style={styles.playButtonText}>Play mix</Text>
+              <Ionicons
+                name="play"
+                size={17}
+                color="#211832"
+              />
+
+              <Text style={styles.playButtonText}>
+                Play mix
+              </Text>
             </View>
           </View>
         </Pressable>
@@ -275,22 +408,35 @@ export default function HomeScreen() {
       {/* MOOD SECTION */}
       <View style={styles.sectionContainer}>
         <View style={styles.moodHeading}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text },
+            ]}
+          >
             What's your mood?
           </Text>
 
-          <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
+          <Text
+            style={[
+              styles.sectionSubtitle,
+              { color: colors.muted },
+            ]}
+          >
             Find the sound that matches you.
           </Text>
         </View>
 
         <View style={styles.moodGrid}>
-          {moods.map((mood) => (
+          {moods.map((mood, index) => (
             <Pressable
               key={mood.name}
               style={[
                 styles.moodCard,
-                { backgroundColor: colors.surface },
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
               ]}
               onPress={() =>
                 router.push({
@@ -303,18 +449,29 @@ export default function HomeScreen() {
                 style={[
                   styles.moodIcon,
                   {
-                    backgroundColor: isDark ? '#30221F' : '#FCE9E1',
+                    backgroundColor: isDark
+                      ? '#342548'
+                      : '#EDE4FF',
                   },
                 ]}
               >
                 <Ionicons
                   name={mood.icon}
                   size={21}
-                  color={colors.accent}
+                  color={
+                    index % 2 === 0
+                      ? colors.accent
+                      : '#A98BE8'
+                  }
                 />
               </View>
 
-              <Text style={[styles.moodName, { color: colors.text }]}>
+              <Text
+                style={[
+                  styles.moodName,
+                  { color: colors.text },
+                ]}
+              >
                 {mood.name}
               </Text>
 
@@ -328,11 +485,15 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* LOADING AND ERROR */}
+      {/* LOADING */}
       {loading ? (
-        <StateMessage loading text="Finding your music..." />
+        <StateMessage
+          loading
+          text="Finding your music..."
+        />
       ) : null}
 
+      {/* ERROR */}
       {error ? (
         <StateMessage
           text="Could not load songs. Check your internet and try again."
@@ -374,51 +535,82 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 22,
   },
+
   headerInfo: {
     flex: 1,
   },
+
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 18,
+  },
+
+  brandIcon: {
+    width: 27,
+    height: 27,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  brandName: {
+    fontSize: 19,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+
   greeting: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
+
   title: {
     fontSize: 27,
     fontWeight: '800',
     marginTop: 5,
   },
+
   headerSub: {
     fontSize: 13,
     marginTop: 4,
   },
+
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
+
   themeButton: {
     width: 42,
     height: 42,
-    borderRadius: 21,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   profileButton: {
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderRadius: 25,
     padding: 3,
   },
+
   avatar: {
     width: 39,
     height: 39,
     borderRadius: 22,
   },
+
   avatarFallback: {
     width: 39,
     height: 39,
@@ -426,87 +618,141 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   avatarText: {
     fontSize: 18,
     fontWeight: '800',
   },
+
   sectionContainer: {
     marginTop: 30,
   },
-  sectionHeader: {
+
+  sectionHeading: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 22,
     marginBottom: 15,
   },
+
+  featuredHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 22,
+    marginBottom: 15,
+  },
+
+  headingDecoration: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   eyebrow: {
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.5,
     marginBottom: 7,
   },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '800',
   },
+
   sectionSubtitle: {
     fontSize: 12,
     marginTop: 5,
   },
+
   featured: {
-    minHeight: 245,
+    minHeight: 255,
     marginHorizontal: 22,
     marginTop: 4,
-    borderRadius: 25,
+    borderRadius: 26,
     padding: 21,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
+
   featuredGlow: {
     position: 'absolute',
-    width: 210,
-    height: 210,
-    borderRadius: 110,
+    width: 230,
+    height: 230,
+    borderRadius: 120,
     right: -65,
     top: 35,
-    opacity: 0.65,
+    opacity: 0.55,
   },
+
+  featuredGlowSmall: {
+    position: 'absolute',
+    width: 125,
+    height: 125,
+    borderRadius: 70,
+    right: 35,
+    top: 65,
+    opacity: 0.35,
+  },
+
   featuredTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.17)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
     borderRadius: 20,
   },
+
   tagText: {
     color: '#FFFFFF',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1,
   },
+
+  musicIconCircle: {
+    width: 43,
+    height: 43,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  featuredContent: {
+    marginTop: 25,
+  },
+
   featuredSmall: {
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 1.1,
   },
+
   featuredTitle: {
-    fontSize: 37,
+    fontSize: 38,
     fontWeight: '900',
-    lineHeight: 40,
+    lineHeight: 41,
     marginTop: 7,
   },
+
   featuredSub: {
     fontSize: 12,
     marginTop: 8,
   },
+
   playButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -515,17 +761,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 22,
     paddingHorizontal: 17,
-    paddingVertical: 10,
+    paddingVertical: 11,
     marginTop: 15,
   },
+
   playButtonText: {
-    color: '#171719',
+    color: '#211832',
     fontWeight: '800',
     fontSize: 12,
   },
+
   moodHeading: {
     paddingHorizontal: 22,
   },
+
   moodGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -533,6 +782,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 15,
   },
+
   moodCard: {
     width: '48%',
     minHeight: 78,
@@ -540,21 +790,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 9,
     padding: 12,
-    borderRadius: 16,
+    borderRadius: 17,
+    borderWidth: 1,
     flexGrow: 1,
   },
+
   moodIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 37,
+    height: 37,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   moodName: {
     flex: 1,
     fontSize: 13,
     fontWeight: '700',
   },
+
   trackList: {
     paddingHorizontal: 22,
     gap: 14,

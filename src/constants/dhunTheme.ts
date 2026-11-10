@@ -1,58 +1,61 @@
 ﻿
-// Dhunn app theme
+// Dhunn – Premium Purple Theme
 
-// Existing Dhunn brand colors
 export const colors = {
-  accent: '#D7263D',
-  text: '#111111',
-  muted: '#6B6B70',
-  border: '#E3E3E8',
-  background: '#FFFFFF',
-  surface: '#F0F0F3',
+  accent: '#B99AFF',
+  accentLight: '#D7C5FF',
+  accentDark: '#9270D5',
+
+  text: '#F7F3FF',
+  muted: '#A69BB8',
+  border: '#302842',
+
+  background: '#100C19',
+  surface: '#1B1428',
+  surfaceLight: '#251C35',
+  selected: '#33264A',
+
+  white: '#FFFFFF',
+  black: '#100C19',
 };
 
-// Existing color palette
 export const palette = [
-  '#FF8A65',
-  '#5C6BC0',
-  '#26A69A',
-  '#FFB300',
-  '#8E24AA',
-  '#455A64',
+  '#B99AFF',
+  '#8D75D6',
+  '#C49BFF',
+  '#E5A8D7',
+  '#8174D8',
+  '#A78BFA',
 ];
 
-// Light and dark themes
 export const Colors = {
   light: {
-    background: colors.background,
-    backgroundElement: colors.surface,
-    backgroundSelected: '#FCE8EB',
-    text: colors.text,
-    textSecondary: colors.muted,
-    accent: colors.accent,
-    border: colors.border,
+    background: '#F7F3FF',
+    backgroundElement: '#FFFFFF',
+    backgroundSelected: '#EDE4FF',
+    text: '#211832',
+    textSecondary: '#786B8D',
+    accent: '#8560C9',
+    border: '#E5DDF0',
   },
 
   dark: {
-    background: '#101014',
-    backgroundElement: '#1C1C22',
-    backgroundSelected: '#302027',
-    text: '#FFFFFF',
-    textSecondary: '#A6A6AE',
-    accent: colors.accent,
-    border: '#38383F',
+    background: '#100C19',
+    backgroundElement: '#1B1428',
+    backgroundSelected: '#33264A',
+    text: '#F7F3FF',
+    textSecondary: '#A69BB8',
+    accent: '#B99AFF',
+    border: '#302842',
   },
 };
 
-// Available theme color properties
 export type ThemeColor = keyof typeof Colors.light;
 
-// Font definitions
 export const Fonts = {
   mono: 'monospace',
 };
 
-// Spacing scale (4-point system)
 export const Spacing = {
   half: 2,
   one: 4,
@@ -60,6 +63,9 @@ export const Spacing = {
   three: 12,
   four: 16,
   five: 20,
+  six: 24,
+  seven: 28,
+  eight: 32,
 };
-// Maximum content width for web layout
+
 export const MaxContentWidth = 1200;
