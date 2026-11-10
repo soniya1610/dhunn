@@ -39,34 +39,34 @@ Try the latest Android version of Dhunn:
 ### 🔐 Authentication
 
 <p align="center">
-  <img src="screenshots/auth.jpeg" width="190" alt="Dhunn Login and Signup" />
+  <img src="screenshots/auth.jpeg" width="200" height="390" alt="Dhunn Login and Signup" />
 </p>
 
 ### 🏠 Home Experience
 
 <p align="center">
-  <img src="screenshots/home-light.jpeg" width="190" alt="Home Light Mode" />
-  <img src="screenshots/home-dark.jpeg" width="190" alt="Home Dark Mode" />
-  <img src="screenshots/home-scroll.jpeg" width="190" alt="Home Scroll View" />
+  <img src="screenshots/home-light.jpeg" width="200" height="390" alt="Home Light Mode" />
+  <img src="screenshots/home-dark.jpeg" width="200" height="390" alt="Home Dark Mode" />
+  <img src="screenshots/home-scroll.jpeg" width="200" height="390" alt="Home Scroll View" />
 </p>
 
 ### 🔍 Music Discovery
 
 <p align="center">
-  <img src="screenshots/search-categories.jpeg" width="190" alt="Search Categories" />
-  <img src="screenshots/search-results.jpeg" width="190" alt="Search Results" />
+  <img src="screenshots/search-categories.jpeg" width="200" height="390" alt="Search Categories" />
+  <img src="screenshots/search-results.jpeg" width="200" height="390" alt="Search Results" />
 </p>
 
 ### ❤️ Your Library
 
 <p align="center">
-  <img src="screenshots/library.jpeg" width="190" alt="Dhunn Library" />
+  <img src="screenshots/library.jpeg" width="200" height="390" alt="Dhunn Library" />
 </p>
 
 ### 👤 User Profile
 
 <p align="center">
-  <img src="screenshots/profile.jpeg" width="190" alt="Dhunn Profile" />
+  <img src="screenshots/profile.jpeg" width="200" height="390" alt="Dhunn Profile" />
 </p>
 
 ---
