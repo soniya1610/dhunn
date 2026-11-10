@@ -1,3 +1,4 @@
+
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -40,6 +41,7 @@ export default function SignupScreen() {
 
     try {
       const err = await signUp(name.trim(), email.trim(), password);
+
       if (err) setError(err);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -51,66 +53,137 @@ export default function SignupScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={[styles.orb, styles.orbTop, { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' }]} />
-      <View style={[styles.orb, styles.orbBottom, { backgroundColor: isDark ? '#43266F' : '#FFC9E8' }]} />
+      <View
+        style={[
+          styles.orb,
+          styles.orbTop,
+          { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' },
+        ]}
+      />
+
+      <View
+        style={[
+          styles.orb,
+          styles.orbBottom,
+          { backgroundColor: isDark ? '#43266F' : '#FFC9E8' },
+        ]}
+      />
 
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={[
           styles.container,
           {
             paddingTop: insets.top + 25,
-            paddingBottom: insets.bottom + 30,
+            paddingBottom: insets.bottom + 35,
           },
         ]}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topLabel}>
           <Ionicons name="sparkles" size={13} color="#DDA4FF" />
-          <Text style={styles.topLabelText}>YOUR SOUND. YOUR MOOD.</Text>
+          <Text style={styles.topLabelText}>
+            YOUR SOUND. YOUR MOOD.
+          </Text>
         </View>
 
         <View style={styles.logoWrap}>
           <View style={styles.logo}>
-            <Ionicons name="musical-notes" size={32} color="#FFFFFF" />
+            <Ionicons
+              name="musical-notes"
+              size={32}
+              color="#FFFFFF"
+            />
           </View>
+
           <View style={styles.logoSparkle}>
-            <Ionicons name="sparkles" size={18} color="#FFD1F1" />
+            <Ionicons
+              name="sparkles"
+              size={18}
+              color="#FFD1F1"
+            />
           </View>
         </View>
 
-        <Text style={[styles.brand, { color: textColor }]}>Dhun</Text>
+        <Text style={[styles.brand, { color: textColor }]}>
+          Dhun
+        </Text>
+
         <Text style={[styles.heading, { color: textColor }]}>
           Find your{'\n'}music space.
         </Text>
+
         <Text style={[styles.subtitle, { color: mutedColor }]}>
           One account. All your favourite sounds.
         </Text>
 
-        <View style={[styles.formCard, { backgroundColor: card, borderColor: colors.border }]}>
-          <Text style={[styles.formTitle, { color: textColor }]}>Create your account</Text>
+        <View
+          style={[
+            styles.formCard,
+            { backgroundColor: card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.formTitle, { color: textColor }]}>
+            Create your account
+          </Text>
+
           <Text style={[styles.formSubtitle, { color: mutedColor }]}>
             Let's make your listening experience yours.
           </Text>
 
-          <Text style={[styles.fieldLabel, { color: textColor }]}>YOUR NAME</Text>
-          <View style={[styles.inputWrap, { backgroundColor: inputBackground, borderColor: colors.border }]}>
-            <Ionicons name="person-outline" size={19} color={mutedColor} />
+          <Text style={[styles.fieldLabel, { color: textColor }]}>
+            YOUR NAME
+          </Text>
+
+          <View
+            style={[
+              styles.inputWrap,
+              {
+                backgroundColor: inputBackground,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="person-outline"
+              size={19}
+              color={mutedColor}
+            />
+
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder="Enter your name"
               placeholderTextColor={mutedColor}
               autoCapitalize="words"
+              returnKeyType="next"
               style={[styles.input, { color: textColor }]}
             />
           </View>
 
-          <Text style={[styles.fieldLabel, { color: textColor }]}>EMAIL ADDRESS</Text>
-          <View style={[styles.inputWrap, { backgroundColor: inputBackground, borderColor: colors.border }]}>
-            <Ionicons name="mail-outline" size={19} color={mutedColor} />
+          <Text style={[styles.fieldLabel, { color: textColor }]}>
+            EMAIL ADDRESS
+          </Text>
+
+          <View
+            style={[
+              styles.inputWrap,
+              {
+                backgroundColor: inputBackground,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="mail-outline"
+              size={19}
+              color={mutedColor}
+            />
+
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -119,19 +192,38 @@ export default function SignupScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
+              returnKeyType="next"
               style={[styles.input, { color: textColor }]}
             />
           </View>
 
-          <Text style={[styles.fieldLabel, { color: textColor }]}>PASSWORD</Text>
-          <View style={[styles.inputWrap, { backgroundColor: inputBackground, borderColor: colors.border }]}>
-            <Ionicons name="lock-closed-outline" size={19} color={mutedColor} />
+          <Text style={[styles.fieldLabel, { color: textColor }]}>
+            PASSWORD
+          </Text>
+
+          <View
+            style={[
+              styles.inputWrap,
+              {
+                backgroundColor: inputBackground,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={19}
+              color={mutedColor}
+            />
+
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder="At least 6 characters"
               placeholderTextColor={mutedColor}
               secureTextEntry
+              returnKeyType="done"
+              onSubmitEditing={submit}
               style={[styles.input, { color: textColor }]}
             />
           </View>
@@ -152,7 +244,14 @@ export default function SignupScreen() {
             <Text style={styles.buttonText}>
               {busy ? 'Creating account...' : 'Create account'}
             </Text>
-            {!busy && <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />}
+
+            {!busy && (
+              <Ionicons
+                name="arrow-forward"
+                size={20}
+                color="#FFFFFF"
+              />
+            )}
           </Pressable>
 
           <Text style={[styles.switchText, { color: mutedColor }]}>
@@ -164,7 +263,12 @@ export default function SignupScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Ionicons name="headset-outline" size={15} color={mutedColor} />
+          <Ionicons
+            name="headset-outline"
+            size={15}
+            color={mutedColor}
+          />
+
           <Text style={[styles.footerText, { color: mutedColor }]}>
             Your songs and playlists stay on this phone.
           </Text>

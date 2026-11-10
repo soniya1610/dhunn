@@ -1,4 +1,5 @@
-import { Link } from 'expo-router';
+
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -17,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { signIn } = useAuth();
   const { isDark, colors } = useTheme();
 
@@ -39,6 +41,7 @@ export default function LoginScreen() {
 
     try {
       const err = await signIn(email.trim(), password);
+
       if (err) setError(err);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -50,12 +53,26 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={[styles.orb, styles.orbTop, { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' }]} />
-      <View style={[styles.orb, styles.orbBottom, { backgroundColor: isDark ? '#43266F' : '#FFC9E8' }]} />
+      <View
+        style={[
+          styles.orb,
+          styles.orbTop,
+          { backgroundColor: isDark ? '#7138A8' : '#D9B5FF' },
+        ]}
+      />
+
+      <View
+        style={[
+          styles.orb,
+          styles.orbBottom,
+          { backgroundColor: isDark ? '#43266F' : '#FFC9E8' },
+        ]}
+      />
 
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={[
           styles.container,
           {
@@ -64,39 +81,75 @@ export default function LoginScreen() {
           },
         ]}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topLabel}>
           <Ionicons name="sparkles" size={13} color="#DDA4FF" />
-          <Text style={styles.topLabelText}>YOUR SOUND. YOUR MOOD.</Text>
+          <Text style={styles.topLabelText}>
+            YOUR SOUND. YOUR MOOD.
+          </Text>
         </View>
 
         <View style={styles.logoWrap}>
           <View style={styles.logo}>
-            <Ionicons name="musical-notes" size={34} color="#FFFFFF" />
+            <Ionicons
+              name="musical-notes"
+              size={34}
+              color="#FFFFFF"
+            />
           </View>
+
           <View style={styles.logoSparkle}>
-            <Ionicons name="sparkles" size={18} color="#FFD1F1" />
+            <Ionicons
+              name="sparkles"
+              size={18}
+              color="#FFD1F1"
+            />
           </View>
         </View>
 
-        <Text style={[styles.brand, { color: textColor }]}>Dhun</Text>
+        <Text style={[styles.brand, { color: textColor }]}>
+          Dhun
+        </Text>
+
         <Text style={[styles.heading, { color: textColor }]}>
           Welcome{'\n'}back.
         </Text>
+
         <Text style={[styles.subtitle, { color: mutedColor }]}>
           Your music, your mood, your little escape.
         </Text>
 
-        <View style={[styles.formCard, { backgroundColor: card, borderColor: colors.border }]}>
-          <Text style={[styles.formTitle, { color: textColor }]}>Sign in to your world</Text>
+        <View
+          style={[
+            styles.formCard,
+            { backgroundColor: card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.formTitle, { color: textColor }]}>
+            Sign in to your world
+          </Text>
+
           <Text style={[styles.formSubtitle, { color: mutedColor }]}>
             Pick up right where the music left off.
           </Text>
 
-          <Text style={[styles.fieldLabel, { color: textColor }]}>EMAIL ADDRESS</Text>
-          <View style={[styles.inputWrap, { backgroundColor: inputBackground, borderColor: colors.border }]}>
+          <Text style={[styles.fieldLabel, { color: textColor }]}>
+            EMAIL ADDRESS
+          </Text>
+
+          <View
+            style={[
+              styles.inputWrap,
+              {
+                backgroundColor: inputBackground,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <Ionicons name="mail-outline" size={19} color={mutedColor} />
+
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -105,22 +158,50 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
+              returnKeyType="next"
               style={[styles.input, { color: textColor }]}
             />
           </View>
 
-          <Text style={[styles.fieldLabel, { color: textColor }]}>PASSWORD</Text>
-          <View style={[styles.inputWrap, { backgroundColor: inputBackground, borderColor: colors.border }]}>
-            <Ionicons name="lock-closed-outline" size={19} color={mutedColor} />
+          <Text style={[styles.fieldLabel, { color: textColor }]}>
+            PASSWORD
+          </Text>
+
+          <View
+            style={[
+              styles.inputWrap,
+              {
+                backgroundColor: inputBackground,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={19}
+              color={mutedColor}
+            />
+
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
               placeholderTextColor={mutedColor}
               secureTextEntry
+              returnKeyType="done"
+              onSubmitEditing={submit}
               style={[styles.input, { color: textColor }]}
             />
           </View>
+
+          <Pressable
+            onPress={() => router.push('/forgot-password')}
+            style={styles.forgotButton}
+          >
+            <Text style={styles.forgotText}>
+              Forgot password?
+            </Text>
+          </Pressable>
 
           {error ? (
             <Text style={styles.error}>{error}</Text>
@@ -138,7 +219,14 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>
               {busy ? 'Signing in...' : 'Let me in'}
             </Text>
-            {!busy && <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />}
+
+            {!busy && (
+              <Ionicons
+                name="arrow-forward"
+                size={20}
+                color="#FFFFFF"
+              />
+            )}
           </Pressable>
 
           <Text style={[styles.switchText, { color: mutedColor }]}>
@@ -150,7 +238,12 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Ionicons name="headset-outline" size={15} color={mutedColor} />
+          <Ionicons
+            name="headset-outline"
+            size={15}
+            color={mutedColor}
+          />
+
           <Text style={[styles.footerText, { color: mutedColor }]}>
             Made for the moments that matter.
           </Text>
@@ -281,6 +374,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingVertical: 14,
     paddingLeft: 11,
+  },
+  forgotButton: {
+    alignSelf: 'flex-end',
+    marginTop: -9,
+    marginBottom: 16,
+    paddingVertical: 5,
+  },
+  forgotText: {
+    color: '#B875F5',
+    fontSize: 12,
+    fontWeight: '800',
   },
   error: {
     color: '#FF6B83',
