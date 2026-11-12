@@ -5,6 +5,7 @@ export type Track = {
   album: string;
   artwork: string;
   previewUrl: string;
+  genre?: string;
 };
 
 export type Playlist = {

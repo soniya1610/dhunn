@@ -1,7 +1,12 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   FlatList,
   Image,
@@ -19,9 +24,18 @@ import { useAuth } from '../../context/AuthContext';
 import { useLibrary } from '../../context/LibraryContext';
 import { usePlayer } from '../../context/PlayerContext';
 import { useTheme } from '../../context/ThemeContext';
-import { searchTracks } from '../../services/api';
+import {
+  searchTracks,
+  getTrendingTracks,
+  getLatestTracks,
+  getArtistTracks,
+  getGenreTracks,
+} from '../../services/api';
 import { Track } from '../../types';
 
+const PAGE_SIZE = 20;
+
+// Mood categories
 const moods = [
   {
     name: 'Chill',
@@ -44,6 +58,54 @@ const moods = [
     query: 'energetic hindi songs',
   },
 ];
+
+// Curated playlists: fixed names and search themes
+const curatedPlaylistConfig = [
+  {
+    id: 'romantic',
+    name: 'Romantic Hits',
+    subtitle: 'Songs for every love story',
+    query: 'romantic hindi songs',
+  },
+  {
+    id: 'chill',
+    name: 'Chill Vibes',
+    subtitle: 'Relax and enjoy the moment',
+    query: 'lofi chill music',
+  },
+  {
+    id: 'workout',
+    name: 'Workout Energy',
+    subtitle: 'Music that keeps you moving',
+    query: 'energetic workout music',
+  },
+  {
+    id: 'late-night',
+    name: 'Late Night Melodies',
+    subtitle: 'Perfect for quiet nights',
+    query: 'soft hindi songs',
+  },
+  {
+    id: 'classics',
+    name: 'Bollywood Classics',
+    subtitle: 'Timeless Bollywood favourites',
+    query: 'bollywood classic songs',
+  },
+  {
+    id: 'feel-good',
+    name: 'Feel Good Hits',
+    subtitle: 'A little happiness in every song',
+    query: 'feel good hindi songs',
+  },
+];
+
+type CuratedPlaylist = {
+  id: string;
+  name: string;
+  subtitle: string;
+  query: string;
+  tracks: Track[];
+};
 
 function SectionHeading({
   title,
@@ -119,6 +181,18 @@ function Row({
   );
 }
 
+function uniqueTracks(tracks: Track[]): Track[] {
+  const unique = new Map<string, Track>();
+
+  tracks.forEach((track) => {
+    if (!unique.has(track.id)) {
+      unique.set(track.id, track);
+    }
+  });
+
+  return Array.from(unique.values());
+}
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -128,24 +202,81 @@ export default function HomeScreen() {
   const { play } = usePlayer();
   const { isDark, colors, toggleTheme } = useTheme();
 
+  // Home feed data
   const [picks, setPicks] = useState<Track[]>([]);
   const [trending, setTrending] = useState<Track[]>([]);
+  const [latest, setLatest] = useState<Track[]>([]);
+
+  // Curated playlists
+  const [curatedPlaylists, setCuratedPlaylists] =
+    useState<CuratedPlaylist[]>(() =>
+      curatedPlaylistConfig.map((playlist) => ({
+        ...playlist,
+        tracks: [],
+      }))
+    );
+
+  // Personalized data
+  const [artistRecommendations, setArtistRecommendations] =
+    useState<Track[]>([]);
+  const [genreRecommendations, setGenreRecommendations] =
+    useState<Track[]>([]);
+
+  // Loading states
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(false);
 
+  const loadingMoreRef = useRef(false);
+  const trendingLengthRef = useRef(0);
+
+  // Initial Home feed
   const load = useCallback(async () => {
     setLoading(true);
     setError(false);
+    setHasMore(true);
 
     try {
-      const [a, b] = await Promise.all([
-        searchTracks('arijit singh', 20),
-        searchTracks('top hindi songs', 20),
+      const results = await Promise.allSettled([
+        searchTracks('arijit singh', PAGE_SIZE),
+        getTrendingTracks(PAGE_SIZE, 0),
+        getLatestTracks(PAGE_SIZE, 0),
       ]);
 
-      setPicks(a);
-      setTrending(b);
-    } catch {
+      const [picksResult, trendingResult, latestResult] = results;
+
+      const arijitTracks =
+        picksResult.status === 'fulfilled'
+          ? picksResult.value
+          : [];
+
+      const trendingTracks =
+        trendingResult.status === 'fulfilled'
+          ? trendingResult.value
+          : [];
+
+      const latestTracks =
+        latestResult.status === 'fulfilled'
+          ? latestResult.value
+          : [];
+
+      setPicks(arijitTracks);
+      setTrending(trendingTracks);
+      setLatest(latestTracks);
+
+      trendingLengthRef.current = trendingTracks.length;
+      setHasMore(trendingTracks.length === PAGE_SIZE);
+
+      if (
+        arijitTracks.length === 0 &&
+        trendingTracks.length === 0 &&
+        latestTracks.length === 0
+      ) {
+        setError(true);
+      }
+    } catch (err) {
+      console.log('Home feed error:', err);
       setError(true);
     } finally {
       setLoading(false);
@@ -155,6 +286,170 @@ export default function HomeScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Load curated playlists from Audius
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCuratedPlaylists = async () => {
+      const results = await Promise.all(
+        curatedPlaylistConfig.map(async (playlist) => {
+          try {
+            const tracks = await searchTracks(
+              playlist.query,
+              12
+            );
+
+            return {
+              ...playlist,
+              tracks,
+            };
+          } catch (err) {
+            console.log(
+              `Playlist error (${playlist.name}):`,
+              err
+            );
+
+            return {
+              ...playlist,
+              tracks: [],
+            };
+          }
+        })
+      );
+
+      if (!cancelled) {
+        setCuratedPlaylists(results);
+      }
+    };
+
+    loadCuratedPlaylists();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Recommendations based on recently played tracks
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadRecommendations = async () => {
+      if (recent.length === 0) {
+        setArtistRecommendations([]);
+        setGenreRecommendations([]);
+        return;
+      }
+
+      try {
+        const recentTrackIds = new Set(
+          recent.map((track) => track.id)
+        );
+
+        const artists = Array.from(
+          new Set(
+            recent
+              .slice(0, 5)
+              .map((track) => track.artist)
+              .filter(Boolean)
+          )
+        ).slice(0, 3);
+
+        const genre = recent.find(
+          (track) => track.genre?.trim()
+        )?.genre;
+
+        const [artistResults, genreResults] = await Promise.all([
+          Promise.all(
+            artists.map((artist) =>
+              getArtistTracks(artist, 10).catch(() => [])
+            )
+          ),
+          genre
+            ? getGenreTracks(genre, PAGE_SIZE).catch(() => [])
+            : Promise.resolve([]),
+        ]);
+
+        if (cancelled) return;
+
+        const artistTracks = uniqueTracks(
+          artistResults.flat()
+        ).filter(
+          (track) => !recentTrackIds.has(track.id)
+        );
+
+        const genreTracks = uniqueTracks(
+          genreResults
+        ).filter(
+          (track) => !recentTrackIds.has(track.id)
+        );
+
+        setArtistRecommendations(artistTracks);
+        setGenreRecommendations(genreTracks);
+      } catch (err) {
+        console.log('Recommendation error:', err);
+      }
+    };
+
+    loadRecommendations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [recent]);
+
+  // Made for You combines artist and genre recommendations
+  const madeForYou = uniqueTracks([
+    ...genreRecommendations,
+    ...artistRecommendations,
+  ]);
+
+  // Load more trending songs when the user scrolls down
+  const loadMore = useCallback(async () => {
+    if (
+      loading ||
+      loadingMoreRef.current ||
+      !hasMore
+    ) {
+      return;
+    }
+
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+
+    try {
+      const offset = trendingLengthRef.current;
+
+      const moreTracks = await getTrendingTracks(
+        PAGE_SIZE,
+        offset
+      );
+
+      if (moreTracks.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      setTrending((previous) => {
+        const combined = uniqueTracks([
+          ...previous,
+          ...moreTracks,
+        ]);
+
+        trendingLengthRef.current = combined.length;
+        return combined;
+      });
+
+      if (moreTracks.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.log('Load more error:', err);
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [loading, hasMore]);
 
   const hour = new Date().getHours();
 
@@ -179,6 +474,8 @@ export default function HomeScreen() {
     ? '#D6C4EF'
     : '#665080';
 
+  const featuredTracks = picks.length > 0 ? picks : trending;
+
   return (
     <ScrollView
       style={[
@@ -186,6 +483,22 @@ export default function HomeScreen() {
         { backgroundColor: colors.background },
       ]}
       showsVerticalScrollIndicator={false}
+      onScroll={({ nativeEvent }) => {
+        const {
+          layoutMeasurement,
+          contentOffset,
+          contentSize,
+        } = nativeEvent;
+
+        const distanceFromBottom =
+          contentSize.height -
+          (layoutMeasurement.height + contentOffset.y);
+
+        if (distanceFromBottom < 500) {
+          loadMore();
+        }
+      }}
+      scrollEventThrottle={400}
       contentContainerStyle={{
         paddingTop: insets.top + 14,
         paddingBottom: 155,
@@ -309,8 +622,12 @@ export default function HomeScreen() {
         </View>
 
         <Pressable
-          onPress={() => picks[0] && play(picks[0], picks)}
-          disabled={picks.length === 0}
+          onPress={() => {
+            if (featuredTracks.length > 0) {
+              play(featuredTracks[0], featuredTracks);
+            }
+          }}
+          disabled={featuredTracks.length === 0}
           style={[
             styles.featured,
             { backgroundColor: featuredBackground },
@@ -348,7 +665,9 @@ export default function HomeScreen() {
                 color="#FFFFFF"
               />
 
-              <Text style={styles.tagText}>DHUN EXCLUSIVE</Text>
+              <Text style={styles.tagText}>
+                DHUN EXCLUSIVE
+              </Text>
             </View>
 
             <View style={styles.musicIconCircle}>
@@ -385,8 +704,8 @@ export default function HomeScreen() {
                 { color: featuredMuted },
               ]}
             >
-              {picks.length
-                ? `${picks.length} songs picked for you`
+              {featuredTracks.length
+                ? `${featuredTracks.length} songs picked for you`
                 : 'Your mix is getting ready...'}
             </Text>
 
@@ -505,6 +824,17 @@ export default function HomeScreen() {
       {/* SONG SECTIONS */}
       {!loading && !error ? (
         <>
+          {/* CURATED PLAYLISTS */}
+          {curatedPlaylists.map((playlist) => (
+            <Row
+              key={playlist.id}
+              title={playlist.name}
+              subtitle={playlist.subtitle}
+              tracks={playlist.tracks}
+              colors={colors}
+            />
+          ))}
+
           <Row
             title="Recently played"
             subtitle="Pick up where you left off"
@@ -514,17 +844,63 @@ export default function HomeScreen() {
 
           <Row
             title="For Arijit fans"
-            subtitle="Songs you'll love"
+            subtitle="Handpicked Hindi favourites"
             tracks={picks}
             colors={colors}
           />
 
           <Row
             title="Trending now"
-            subtitle="What everyone's listening to"
+            subtitle="Popular tracks this week"
             tracks={trending}
             colors={colors}
           />
+
+          <Row
+            title="New releases"
+            subtitle="Fresh music from creators"
+            tracks={latest}
+            colors={colors}
+          />
+
+          <Row
+            title="Made for you"
+            subtitle="Based on your listening history"
+            tracks={madeForYou}
+            colors={colors}
+          />
+
+          <Row
+            title="Your favourite artists"
+            subtitle="More music from artists you play"
+            tracks={artistRecommendations}
+            colors={colors}
+          />
+
+          <Row
+            title="Explore similar genres"
+            subtitle="Discover music matching your taste"
+            tracks={genreRecommendations}
+            colors={colors}
+          />
+
+          {loadingMore ? (
+            <StateMessage
+              loading
+              text="Loading more music..."
+            />
+          ) : null}
+
+          {!hasMore && trending.length > 0 ? (
+            <Text
+              style={[
+                styles.endMessage,
+                { color: colors.muted },
+              ]}
+            >
+              You're all caught up!
+            </Text>
+          ) : null}
         </>
       ) : null}
     </ScrollView>
@@ -812,5 +1188,11 @@ const styles = StyleSheet.create({
   trackList: {
     paddingHorizontal: 22,
     gap: 14,
+  },
+
+  endMessage: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 12,
   },
 });
