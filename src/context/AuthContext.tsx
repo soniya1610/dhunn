@@ -3,23 +3,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react';
 
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  updateProfile,
+} from 'firebase/auth';
+
+import { auth } from '../services/firebase';
+
 export type User = {
   name: string;
   email: string;
   photo?: string;
 };
-
-type StoredUser = User & { password: string };
-
-const USERS_KEY = 'dhun:users';
-const SESSION_KEY = 'dhun:session';
 
 type AuthCtx = {
   user: User | null;
@@ -32,7 +37,7 @@ type AuthCtx = {
   signIn: (email: string, password: string) => Promise<string | null>;
   resetPassword: (
     email: string,
-    newPassword: string
+    _newPassword?: string
   ) => Promise<string | null>;
   signOut: () => Promise<void>;
   updatePhoto: (uri: string) => Promise<void>;
@@ -40,166 +45,190 @@ type AuthCtx = {
 
 const Ctx = createContext<AuthCtx | null>(null);
 
-async function readUsers(): Promise<StoredUser[]> {
-  try {
-    const raw = await AsyncStorage.getItem(USERS_KEY);
-    return raw ? (JSON.parse(raw) as StoredUser[]) : [];
-  } catch {
-    return [];
+const PHOTO_KEY_PREFIX = 'dhun:profile-photo:';
+
+function getErrorMessage(error: unknown): string {
+  const code =
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error
+      ? String(error.code)
+      : '';
+
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'An account with this email already exists.';
+
+    case 'auth/invalid-email':
+      return 'Please enter a valid email.';
+
+    case 'auth/weak-password':
+      return 'Password must be at least 6 characters.';
+
+    case 'auth/invalid-credential':
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Wrong email or password.';
+
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Please try again later.';
+
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your internet connection.';
+
+    case 'auth/operation-not-allowed':
+      return 'Email/Password sign-in is not enabled in Firebase.';
+
+    case 'auth/user-disabled':
+      return 'This account has been disabled.';
+
+    default:
+      return error instanceof Error
+        ? error.message
+        : 'Something went wrong. Please try again.';
   }
 }
-
-const strip = (u: StoredUser): User => ({
-  name: u.name,
-  email: u.email,
-  photo: u.photo,
-});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen to Firebase authentication state.
   useEffect(() => {
-    (async () => {
-      try {
-        const email = await AsyncStorage.getItem(SESSION_KEY);
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser) => {
+        try {
+          if (!firebaseUser) {
+            setUser(null);
+            return;
+          }
 
-        if (email) {
-          const found = (await readUsers()).find(
-            (u) => u.email === email
+          const savedPhoto = await AsyncStorage.getItem(
+            `${PHOTO_KEY_PREFIX}${firebaseUser.uid}`
           );
 
-          if (found) setUser(strip(found));
+          setUser({
+            name:
+              firebaseUser.displayName ||
+              firebaseUser.email?.split('@')[0] ||
+              'Dhunn User',
+            email: firebaseUser.email || '',
+            photo: savedPhoto || firebaseUser.photoURL || undefined,
+          });
+        } catch {
+          if (firebaseUser) {
+            setUser({
+              name: firebaseUser.displayName || 'Dhunn User',
+              email: firebaseUser.email || '',
+              photo: firebaseUser.photoURL || undefined,
+            });
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
       }
-    })();
+    );
+
+    return unsubscribe;
   }, []);
 
-  const signUp = useCallback(
-    async (name: string, email: string, password: string) => {
-      const cleanEmail = email.trim().toLowerCase();
+  // Create a new Firebase account.
+  const signUp = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<string | null> => {
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
-      if (!name.trim()) return 'Please enter your name.';
+    if (!cleanName) return 'Please enter your name.';
 
-      if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-        return 'Please enter a valid email.';
-      }
+    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      return 'Please enter a valid email.';
+    }
 
-      if (password.length < 6) {
-        return 'Password must be at least 6 characters.';
-      }
+    if (password.length < 6) {
+      return 'Password must be at least 6 characters.';
+    }
 
-      const users = await readUsers();
-
-      if (users.some((u) => u.email === cleanEmail)) {
-        return 'An account with this email already exists.';
-      }
-
-      const created: StoredUser = {
-        name: name.trim(),
-        email: cleanEmail,
-        password,
-      };
-
-      await AsyncStorage.setItem(
-        USERS_KEY,
-        JSON.stringify([...users, created])
+    try {
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        cleanEmail,
+        password
       );
 
-      await AsyncStorage.setItem(SESSION_KEY, cleanEmail);
-
-      setUser(strip(created));
+      await updateProfile(credential.user, {
+        displayName: cleanName,
+      });
 
       return null;
-    },
-    []
-  );
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  };
 
-  const signIn = useCallback(
-    async (email: string, password: string) => {
-      const cleanEmail = email.trim().toLowerCase();
+  // Sign in with Firebase.
+  const signIn = async (
+    email: string,
+    password: string
+  ): Promise<string | null> => {
+    const cleanEmail = email.trim().toLowerCase();
 
-      const found = (await readUsers()).find(
-        (u) => u.email === cleanEmail && u.password === password
-      );
+    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      return 'Please enter a valid email.';
+    }
 
-      if (!found) return 'Wrong email or password.';
-
-      await AsyncStorage.setItem(SESSION_KEY, cleanEmail);
-
-      setUser(strip(found));
-
+    try {
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
       return null;
-    },
-    []
-  );
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  };
 
-  const resetPassword = useCallback(
-    async (email: string, newPassword: string) => {
-      const cleanEmail = email.trim().toLowerCase();
+  // Firebase sends a password reset email.
+  const resetPassword = async (
+    email: string,
+    _newPassword?: string
+  ): Promise<string | null> => {
+    const cleanEmail = email.trim().toLowerCase();
 
-      if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-        return 'Please enter a valid email.';
-      }
+    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      return 'Please enter a valid email.';
+    }
 
-      if (newPassword.length < 6) {
-        return 'Password must be at least 6 characters.';
-      }
-
-      const users = await readUsers();
-
-      const userIndex = users.findIndex(
-        (u) => u.email === cleanEmail
-      );
-
-      if (userIndex === -1) {
-        return 'No account found with this email.';
-      }
-
-      const updatedUsers = [...users];
-
-      updatedUsers[userIndex] = {
-        ...updatedUsers[userIndex],
-        password: newPassword,
-      };
-
-      await AsyncStorage.setItem(
-        USERS_KEY,
-        JSON.stringify(updatedUsers)
-      );
-
+    try {
+      await sendPasswordResetEmail(auth, cleanEmail);
       return null;
-    },
-    []
-  );
+    } catch (error) {
+      return getErrorMessage(error);
+    }
+  };
 
-  const signOut = useCallback(async () => {
-    await AsyncStorage.removeItem(SESSION_KEY);
-    setUser(null);
-  }, []);
+  // Sign out from Firebase.
+  const signOut = async (): Promise<void> => {
+    await firebaseSignOut(auth);
+  };
 
-  const updatePhoto = useCallback(
-    async (uri: string) => {
-      if (!user) return;
+  // Save profile photo locally for now.
+  const updatePhoto = async (uri: string): Promise<void> => {
+    const currentUser = auth.currentUser;
 
-      const users = await readUsers();
+    if (!currentUser) return;
 
-      await AsyncStorage.setItem(
-        USERS_KEY,
-        JSON.stringify(
-          users.map((u) =>
-            u.email === user.email ? { ...u, photo: uri } : u
-          )
-        )
-      );
+    await AsyncStorage.setItem(
+      `${PHOTO_KEY_PREFIX}${currentUser.uid}`,
+      uri
+    );
 
-      setUser({ ...user, photo: uri });
-    },
-    [user]
-  );
+    setUser((current) =>
+      current ? { ...current, photo: uri } : current
+    );
+  };
 
+  // Memoize context value.
   const value = useMemo(
     () => ({
       user,
@@ -210,26 +239,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       updatePhoto,
     }),
-    [
-      user,
-      loading,
-      signUp,
-      signIn,
-      resetPassword,
-      signOut,
-      updatePhoto,
-    ]
+    [user, loading]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useAuth(): AuthCtx {
-  const v = useContext(Ctx);
+  const context = useContext(Ctx);
 
-  if (!v) {
+  if (!context) {
     throw new Error('useAuth must be used inside AuthProvider');
   }
 
-  return v;
+  return context;
 }

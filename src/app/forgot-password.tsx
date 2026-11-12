@@ -24,34 +24,18 @@ export default function ForgotPasswordScreen() {
   const { colors } = useTheme();
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleReset = async () => {
-    if (!email.trim() || !password || !confirmPassword) {
-      Alert.alert('Missing fields', 'Please fill in all fields.');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert(
-        'Invalid password',
-        'Password must contain at least 6 characters.',
-      );
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Password mismatch', 'Both passwords must match.');
+    if (!email.trim()) {
+      Alert.alert('Missing email', 'Please enter your registered email.');
       return;
     }
 
     try {
       setLoading(true);
 
-      const error = await resetPassword(email.trim(), password);
+      const error = await resetPassword(email.trim());
 
       if (error) {
         Alert.alert('Reset failed', error);
@@ -59,9 +43,14 @@ export default function ForgotPasswordScreen() {
       }
 
       Alert.alert(
-        'Password updated',
-        'Your password has been changed successfully.',
-        [{ text: 'Go to Login', onPress: () => router.replace('/login') }],
+        'Reset link sent',
+        'Check your email inbox for the password reset link. Follow the instructions to create a new password.',
+        [
+          {
+            text: 'Go to Login',
+            onPress: () => router.replace('/login'),
+          },
+        ]
       );
     } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
@@ -109,24 +98,33 @@ export default function ForgotPasswordScreen() {
               { backgroundColor: 'rgba(173,130,255,0.15)' },
             ]}
           >
-            <Ionicons name="lock-open-outline" size={37} color={colors.accent} />
+            <Ionicons
+              name="lock-open-outline"
+              size={37}
+              color={colors.accent}
+            />
           </View>
 
           <Text style={[styles.eyebrow, { color: colors.accent }]}>
             ACCOUNT RECOVERY
           </Text>
+
           <Text style={[styles.title, { color: colors.text }]}>
             Reset Password
           </Text>
+
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Enter your registered email and create a new password.
+            Enter your registered email address. We'll send you a link to
+            securely reset your password.
           </Text>
 
           <Text style={[styles.label, { color: colors.text }]}>
             EMAIL ADDRESS
           </Text>
+
           <View style={inputStyle}>
             <Ionicons name="mail-outline" size={20} color={colors.muted} />
+
             <TextInput
               style={[styles.input, { color: colors.text }]}
               placeholder="Enter your registered email"
@@ -136,53 +134,6 @@ export default function ForgotPasswordScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
-              returnKeyType="next"
-            />
-          </View>
-
-          <Text style={[styles.label, { color: colors.text }]}>
-            NEW PASSWORD
-          </Text>
-          <View style={inputStyle}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color={colors.muted}
-            />
-            <TextInput
-              style={[styles.input, { color: colors.text }]}
-              placeholder="Enter new password"
-              placeholderTextColor={colors.muted}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              returnKeyType="next"
-            />
-            <Pressable onPress={() => setShowPassword((v) => !v)}>
-              <Ionicons
-                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                size={21}
-                color={colors.muted}
-              />
-            </Pressable>
-          </View>
-
-          <Text style={[styles.label, { color: colors.text }]}>
-            CONFIRM PASSWORD
-          </Text>
-          <View style={inputStyle}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color={colors.muted}
-            />
-            <TextInput
-              style={[styles.input, { color: colors.text }]}
-              placeholder="Confirm new password"
-              placeholderTextColor={colors.muted}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showPassword}
               returnKeyType="done"
               onSubmitEditing={handleReset}
             />
@@ -198,8 +149,9 @@ export default function ForgotPasswordScreen() {
             disabled={loading}
           >
             <Text style={styles.resetButtonText}>
-              {loading ? 'Updating...' : 'Reset Password'}
+              {loading ? 'Sending...' : 'Send Reset Link'}
             </Text>
+
             {!loading && (
               <Ionicons name="arrow-forward" size={19} color="#FFFFFF" />
             )}
