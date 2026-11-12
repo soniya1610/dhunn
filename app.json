@@ -8,7 +8,9 @@
     "scheme": "dhunn",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.soniya.dhun",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +22,7 @@
       "softwareKeyboardLayoutMode": "resize",
       "predictiveBackGestureEnabled": false,
       "package": "com.soniya.dhun",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
@@ -50,7 +53,9 @@
       ],
       "expo-audio",
       "expo-status-bar",
-      "expo-asset"
+      "expo-asset",
+      "react-native-nitro-google-signin",
+      "./plugins/withPlayServicesAuthVersion"
     ],
     "experiments": {
       "typedRoutes": true,

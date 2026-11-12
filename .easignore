@@ -1,0 +1,55 @@
+# Dependencies
+
+node_modules/
+
+# Expo
+
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native build cache (keep Android source files)
+
+.kotlin/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+
+# Temporary files
+
+_.orig._
+_.jks
+_.p8
+_.p12
+_.key
+_.mobileprovision
+_.pem
+.DS_Store
+
+# Metro
+
+.metro-health-check\*
+
+# Debug
+
+npm-debug._
+yarn-debug._
+yarn-error.\*
+
+# Local environment
+
+.env\*.local
+
+# TypeScript
+
+\*.tsbuildinfo
+
+# Other
+
+example
+
+# Ignore iOS native folder
+
+/ios
