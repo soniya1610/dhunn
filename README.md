@@ -16,22 +16,21 @@
 
 Try the latest Android version of Dhunn:
 
-**[⬇️ Download Dhunn APK](https://expo.dev/artifacts/eas/955LdLG11CgGFOoISMUzZNmG11T0sNn2KBUJiIdWHkg.apk)**
+**[⬇️ Download Dhunn APK](https://expo.dev/artifacts/eas/0g_AiSl2i6oBMnEJ6NgbSHPptTmeQ6Ij_Av_fEVKLs8.apk)**
 
 > Download the APK, install it on your Android device and start listening.
 
----
-
 ## ✨ Features
 
-- 🎧 **Music Discovery** – Explore and discover songs.
+- 🎧 **Music Discovery** – Discover and explore songs using the Audius API.
 - 🔍 **Smart Search** – Search for tracks and explore music categories.
-- ▶️ **Music Player** – Play, pause, skip and control playback.
-- ❤️ **Liked Songs** – Save your favourite tracks.
+- ▶️ **Music Player** – Play, pause, skip and control music playback.
+- 🕒 **Recently Played** – Quickly access your recently played songs.
+- ❤️ **Liked Songs** – Save and manage your favourite tracks.
 - 📂 **Playlist Management** – Create, manage and organize playlists.
 - 🌙 **Dark & Light Mode** – Switch between beautiful themes.
 - 👤 **User Profile** – Manage your profile and view listening statistics.
-- 🔐 **Authentication** – Login, signup and password reset screens.
+- 🔐 **Authentication** – Login, signup and password reset using Firebase Authentication.
 - 🎨 **Modern UI** – Premium purple and lavender-inspired interface.
 
 ## 🖼️ App Screenshots
@@ -73,16 +72,20 @@ Try the latest Android version of Dhunn:
 
 ## 🛠️ Tech Stack
 
-| Technology        | Purpose                        |
-| ----------------- | ------------------------------ |
-| React Native      | Mobile application development |
-| Expo              | Development and build platform |
-| TypeScript        | Type-safe development          |
-| Expo Router       | File-based navigation          |
-| React Context API | Global state management        |
-| AsyncStorage      | Local data persistence         |
-| Ionicons          | Application icons              |
-| Expo Image Picker | Profile photo selection        |
+| Technology              | Purpose                        |
+| ----------------------- | ------------------------------ |
+| React Native            | Mobile application development |
+| Expo SDK 58             | Development and build platform |
+| TypeScript              | Type-safe development          |
+| Expo Router             | File-based navigation          |
+| React Context API       | Global state management        |
+| AsyncStorage            | Local data persistence         |
+| Firebase Authentication | User authentication            |
+| Cloud Firestore         | Database integration           |
+| Audius API              | Music discovery and streaming  |
+| Expo Audio              | Audio playback                 |
+| Expo Image Picker       | Profile photo selection        |
+| Ionicons                | Application icons              |
 
 ## 📁 Project Structure
 
@@ -105,9 +108,11 @@ dhunn/
 │   ├── hooks/
 │   ├── services/
 │   └── types/
-├── app.json
-├── eas.json
+├── plugins/
+├──.gitignore
+├──.easignore
 ├── package.json
+├── .env.example
 └── README.md
 ```
 
@@ -131,13 +136,33 @@ cd dhunn
 npm install
 ```
 
-### 4. Start the Expo development server
+### 4. Configure environment variables
+
+Create a `.env` file in the root directory and add the required API configuration.
+
+Example:
+
+```env
+EXPO_PUBLIC_AUDIUS_API_URL=your_audius_api_url
+EXPO_PUBLIC_AUDIUS_API_KEY=your_audius_api_key
+
+EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+```
+
+> Replace the placeholder values with your own credentials. Never commit your actual `.env` file to GitHub.
+
+### 5. Start the Expo development server
 
 ```bash
 npx expo start
 ```
 
-Follow the Expo CLI instructions to run the app on your device or emulator.
+Follow the Expo CLI instructions to run the application on your device or emulator.
 
 ## 🏗️ Build APK
 
