@@ -1,12 +1,6 @@
-
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -15,87 +9,87 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import StateMessage from '../../components/StateMessage';
-import TrackCard from '../../components/TrackCard';
-import { useAuth } from '../../context/AuthContext';
-import { useLibrary } from '../../context/LibraryContext';
-import { usePlayer } from '../../context/PlayerContext';
-import { useTheme } from '../../context/ThemeContext';
+import StateMessage from "../../components/StateMessage";
+import TrackCard from "../../components/TrackCard";
+import { useAuth } from "../../context/AuthContext";
+import { useLibrary } from "../../context/LibraryContext";
+import { usePlayer } from "../../context/PlayerContext";
+import { useTheme } from "../../context/ThemeContext";
 import {
-  searchTracks,
-  getTrendingTracks,
-  getLatestTracks,
   getArtistTracks,
   getGenreTracks,
-} from '../../services/api';
-import { Track } from '../../types';
+  getLatestTracks,
+  getTrendingTracks,
+  searchTracks,
+} from "../../services/api";
+import { Track } from "../../types";
 
 const PAGE_SIZE = 20;
 
 // Mood categories
 const moods = [
   {
-    name: 'Chill',
-    icon: 'cloudy-night-outline' as const,
-    query: 'lofi chill',
+    name: "Chill",
+    icon: "cloudy-night-outline" as const,
+    query: "lofi chill",
   },
   {
-    name: 'Romantic',
-    icon: 'heart-outline' as const,
-    query: 'romantic hindi songs',
+    name: "Romantic",
+    icon: "heart-outline" as const,
+    query: "romantic hindi songs",
   },
   {
-    name: 'Focus',
-    icon: 'headset-outline' as const,
-    query: 'focus music',
+    name: "Focus",
+    icon: "headset-outline" as const,
+    query: "focus music",
   },
   {
-    name: 'Energy',
-    icon: 'flash-outline' as const,
-    query: 'energetic hindi songs',
+    name: "Energy",
+    icon: "flash-outline" as const,
+    query: "energetic hindi songs",
   },
 ];
 
 // Curated playlists: fixed names and search themes
 const curatedPlaylistConfig = [
   {
-    id: 'romantic',
-    name: 'Romantic Hits',
-    subtitle: 'Songs for every love story',
-    query: 'romantic hindi songs',
+    id: "romantic",
+    name: "Romantic Hits",
+    subtitle: "Songs for every love story",
+    query: "romantic hindi songs",
   },
   {
-    id: 'chill',
-    name: 'Chill Vibes',
-    subtitle: 'Relax and enjoy the moment',
-    query: 'lofi chill music',
+    id: "chill",
+    name: "Chill Vibes",
+    subtitle: "Relax and enjoy the moment",
+    query: "lofi chill music",
   },
   {
-    id: 'workout',
-    name: 'Workout Energy',
-    subtitle: 'Music that keeps you moving',
-    query: 'energetic workout music',
+    id: "workout",
+    name: "Workout Energy",
+    subtitle: "Music that keeps you moving",
+    query: "energetic workout music",
   },
   {
-    id: 'late-night',
-    name: 'Late Night Melodies',
-    subtitle: 'Perfect for quiet nights',
-    query: 'soft hindi songs',
+    id: "late-night",
+    name: "Late Night Melodies",
+    subtitle: "Perfect for quiet nights",
+    query: "soft hindi songs",
   },
   {
-    id: 'classics',
-    name: 'Bollywood Classics',
-    subtitle: 'Timeless Bollywood favourites',
-    query: 'bollywood classic songs',
+    id: "classics",
+    name: "Bollywood Classics",
+    subtitle: "Timeless Bollywood favourites",
+    query: "bollywood classic songs",
   },
   {
-    id: 'feel-good',
-    name: 'Feel Good Hits',
-    subtitle: 'A little happiness in every song',
-    query: 'feel good hindi songs',
+    id: "feel-good",
+    name: "Feel Good Hits",
+    subtitle: "A little happiness in every song",
+    query: "feel good hindi songs",
   },
 ];
 
@@ -114,7 +108,7 @@ function SectionHeading({
 }: {
   title: string;
   subtitle?: string;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: ReturnType<typeof useTheme>["colors"];
 }) {
   return (
     <View style={styles.sectionHeading}>
@@ -131,16 +125,9 @@ function SectionHeading({
       </View>
 
       <View
-        style={[
-          styles.headingDecoration,
-          { backgroundColor: colors.surface },
-        ]}
+        style={[styles.headingDecoration, { backgroundColor: colors.surface }]}
       >
-        <Ionicons
-          name="sparkles"
-          size={17}
-          color={colors.accent}
-        />
+        <Ionicons name="sparkles" size={17} color={colors.accent} />
       </View>
     </View>
   );
@@ -155,17 +142,13 @@ function Row({
   title: string;
   subtitle?: string;
   tracks: Track[];
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: ReturnType<typeof useTheme>["colors"];
 }) {
   if (tracks.length === 0) return null;
 
   return (
     <View style={styles.sectionContainer}>
-      <SectionHeading
-        title={title}
-        subtitle={subtitle}
-        colors={colors}
-      />
+      <SectionHeading title={title} subtitle={subtitle} colors={colors} />
 
       <FlatList
         data={tracks}
@@ -173,9 +156,7 @@ function Row({
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.trackList}
-        renderItem={({ item }) => (
-          <TrackCard track={item} queue={tracks} />
-        )}
+        renderItem={({ item }) => <TrackCard track={item} queue={tracks} />}
       />
     </View>
   );
@@ -208,19 +189,19 @@ export default function HomeScreen() {
   const [latest, setLatest] = useState<Track[]>([]);
 
   // Curated playlists
-  const [curatedPlaylists, setCuratedPlaylists] =
-    useState<CuratedPlaylist[]>(() =>
+  const [curatedPlaylists, setCuratedPlaylists] = useState<CuratedPlaylist[]>(
+    () =>
       curatedPlaylistConfig.map((playlist) => ({
         ...playlist,
         tracks: [],
-      }))
-    );
+      })),
+  );
 
   // Personalized data
-  const [artistRecommendations, setArtistRecommendations] =
-    useState<Track[]>([]);
-  const [genreRecommendations, setGenreRecommendations] =
-    useState<Track[]>([]);
+  const [artistRecommendations, setArtistRecommendations] = useState<Track[]>(
+    [],
+  );
+  const [genreRecommendations, setGenreRecommendations] = useState<Track[]>([]);
 
   // Loading states
   const [loading, setLoading] = useState(true);
@@ -239,7 +220,7 @@ export default function HomeScreen() {
 
     try {
       const results = await Promise.allSettled([
-        searchTracks('arijit singh', PAGE_SIZE),
+        searchTracks("arijit singh", PAGE_SIZE),
         getTrendingTracks(PAGE_SIZE, 0),
         getLatestTracks(PAGE_SIZE, 0),
       ]);
@@ -247,19 +228,13 @@ export default function HomeScreen() {
       const [picksResult, trendingResult, latestResult] = results;
 
       const arijitTracks =
-        picksResult.status === 'fulfilled'
-          ? picksResult.value
-          : [];
+        picksResult.status === "fulfilled" ? picksResult.value : [];
 
       const trendingTracks =
-        trendingResult.status === 'fulfilled'
-          ? trendingResult.value
-          : [];
+        trendingResult.status === "fulfilled" ? trendingResult.value : [];
 
       const latestTracks =
-        latestResult.status === 'fulfilled'
-          ? latestResult.value
-          : [];
+        latestResult.status === "fulfilled" ? latestResult.value : [];
 
       setPicks(arijitTracks);
       setTrending(trendingTracks);
@@ -276,7 +251,7 @@ export default function HomeScreen() {
         setError(true);
       }
     } catch (err) {
-      console.log('Home feed error:', err);
+      console.log("Home feed error:", err);
       setError(true);
     } finally {
       setLoading(false);
@@ -295,27 +270,21 @@ export default function HomeScreen() {
       const results = await Promise.all(
         curatedPlaylistConfig.map(async (playlist) => {
           try {
-            const tracks = await searchTracks(
-              playlist.query,
-              12
-            );
+            const tracks = await searchTracks(playlist.query, 12);
 
             return {
               ...playlist,
               tracks,
             };
           } catch (err) {
-            console.log(
-              `Playlist error (${playlist.name}):`,
-              err
-            );
+            console.log(`Playlist error (${playlist.name}):`, err);
 
             return {
               ...playlist,
               tracks: [],
             };
           }
-        })
+        }),
       );
 
       if (!cancelled) {
@@ -342,28 +311,24 @@ export default function HomeScreen() {
       }
 
       try {
-        const recentTrackIds = new Set(
-          recent.map((track) => track.id)
-        );
+        const recentTrackIds = new Set(recent.map((track) => track.id));
 
         const artists = Array.from(
           new Set(
             recent
               .slice(0, 5)
               .map((track) => track.artist)
-              .filter(Boolean)
-          )
+              .filter(Boolean),
+          ),
         ).slice(0, 3);
 
-        const genre = recent.find(
-          (track) => track.genre?.trim()
-        )?.genre;
+        const genre = recent.find((track) => track.genre?.trim())?.genre;
 
         const [artistResults, genreResults] = await Promise.all([
           Promise.all(
             artists.map((artist) =>
-              getArtistTracks(artist, 10).catch(() => [])
-            )
+              getArtistTracks(artist, 10).catch(() => []),
+            ),
           ),
           genre
             ? getGenreTracks(genre, PAGE_SIZE).catch(() => [])
@@ -372,22 +337,18 @@ export default function HomeScreen() {
 
         if (cancelled) return;
 
-        const artistTracks = uniqueTracks(
-          artistResults.flat()
-        ).filter(
-          (track) => !recentTrackIds.has(track.id)
+        const artistTracks = uniqueTracks(artistResults.flat()).filter(
+          (track) => !recentTrackIds.has(track.id),
         );
 
-        const genreTracks = uniqueTracks(
-          genreResults
-        ).filter(
-          (track) => !recentTrackIds.has(track.id)
+        const genreTracks = uniqueTracks(genreResults).filter(
+          (track) => !recentTrackIds.has(track.id),
         );
 
         setArtistRecommendations(artistTracks);
         setGenreRecommendations(genreTracks);
       } catch (err) {
-        console.log('Recommendation error:', err);
+        console.log("Recommendation error:", err);
       }
     };
 
@@ -406,11 +367,7 @@ export default function HomeScreen() {
 
   // Load more trending songs when the user scrolls down
   const loadMore = useCallback(async () => {
-    if (
-      loading ||
-      loadingMoreRef.current ||
-      !hasMore
-    ) {
+    if (loading || loadingMoreRef.current || !hasMore) {
       return;
     }
 
@@ -420,10 +377,7 @@ export default function HomeScreen() {
     try {
       const offset = trendingLengthRef.current;
 
-      const moreTracks = await getTrendingTracks(
-        PAGE_SIZE,
-        offset
-      );
+      const moreTracks = await getTrendingTracks(PAGE_SIZE, offset);
 
       if (moreTracks.length === 0) {
         setHasMore(false);
@@ -431,10 +385,7 @@ export default function HomeScreen() {
       }
 
       setTrending((previous) => {
-        const combined = uniqueTracks([
-          ...previous,
-          ...moreTracks,
-        ]);
+        const combined = uniqueTracks([...previous, ...moreTracks]);
 
         trendingLengthRef.current = combined.length;
         return combined;
@@ -444,7 +395,7 @@ export default function HomeScreen() {
         setHasMore(false);
       }
     } catch (err) {
-      console.log('Load more error:', err);
+      console.log("Load more error:", err);
     } finally {
       loadingMoreRef.current = false;
       setLoadingMore(false);
@@ -454,45 +405,27 @@ export default function HomeScreen() {
   const hour = new Date().getHours();
 
   const greeting =
-    hour < 12
-      ? 'Good morning'
-      : hour < 17
-        ? 'Good afternoon'
-        : 'Good evening';
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const firstName = user?.name.split(' ')[0] ?? '';
+  const firstName = user?.name.split(" ")[0] ?? "";
 
-  const featuredBackground = isDark
-    ? '#302044'
-    : '#E8D9FF';
+  const featuredBackground = isDark ? "#302044" : "#E8D9FF";
 
-  const featuredText = isDark
-    ? '#FFFFFF'
-    : '#28183D';
+  const featuredText = isDark ? "#FFFFFF" : "#28183D";
 
-  const featuredMuted = isDark
-    ? '#D6C4EF'
-    : '#665080';
+  const featuredMuted = isDark ? "#D6C4EF" : "#665080";
 
   const featuredTracks = picks.length > 0 ? picks : trending;
 
   return (
     <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: colors.background },
-      ]}
+      style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
       onScroll={({ nativeEvent }) => {
-        const {
-          layoutMeasurement,
-          contentOffset,
-          contentSize,
-        } = nativeEvent;
+        const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
 
         const distanceFromBottom =
-          contentSize.height -
-          (layoutMeasurement.height + contentOffset.y);
+          contentSize.height - (layoutMeasurement.height + contentOffset.y);
 
         if (distanceFromBottom < 500) {
           loadMore();
@@ -509,16 +442,9 @@ export default function HomeScreen() {
         <View style={styles.headerInfo}>
           <View style={styles.brandRow}>
             <View
-              style={[
-                styles.brandIcon,
-                { backgroundColor: colors.surface },
-              ]}
+              style={[styles.brandIcon, { backgroundColor: colors.surface }]}
             >
-              <Ionicons
-                name="musical-note"
-                size={16}
-                color={colors.accent}
-              />
+              <Ionicons name="musical-note" size={16} color={colors.accent} />
             </View>
 
             <Text style={[styles.brandName, { color: colors.text }]}>
@@ -542,34 +468,25 @@ export default function HomeScreen() {
         <View style={styles.headerActions}>
           <Pressable
             onPress={toggleTheme}
-            style={[
-              styles.themeButton,
-              { backgroundColor: colors.surface },
-            ]}
+            style={[styles.themeButton, { backgroundColor: colors.surface }]}
             accessibilityLabel={
-              isDark ? 'Switch to light mode' : 'Switch to dark mode'
+              isDark ? "Switch to light mode" : "Switch to dark mode"
             }
           >
             <Ionicons
-              name={isDark ? 'sunny-outline' : 'moon-outline'}
+              name={isDark ? "sunny-outline" : "moon-outline"}
               size={20}
               color={colors.accent}
             />
           </Pressable>
 
           <Pressable
-            onPress={() => router.push('/profile')}
+            onPress={() => router.push("/profile")}
             accessibilityLabel="Open profile"
-            style={[
-              styles.profileButton,
-              { borderColor: colors.accent },
-            ]}
+            style={[styles.profileButton, { borderColor: colors.accent }]}
           >
             {user?.photo ? (
-              <Image
-                source={{ uri: user.photo }}
-                style={styles.avatar}
-              />
+              <Image source={{ uri: user.photo }} style={styles.avatar} />
             ) : (
               <View
                 style={[
@@ -577,12 +494,7 @@ export default function HomeScreen() {
                   { backgroundColor: colors.surface },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.avatarText,
-                    { color: colors.accent },
-                  ]}
-                >
+                <Text style={[styles.avatarText, { color: colors.accent }]}>
                   {firstName.charAt(0).toUpperCase()}
                 </Text>
               </View>
@@ -595,30 +507,16 @@ export default function HomeScreen() {
       <View style={styles.sectionContainer}>
         <View style={styles.featuredHeading}>
           <View>
-            <Text
-              style={[
-                styles.eyebrow,
-                { color: colors.accent },
-              ]}
-            >
+            <Text style={[styles.eyebrow, { color: colors.accent }]}>
               YOUR DAILY SOUNDTRACK
             </Text>
 
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: colors.text },
-              ]}
-            >
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Made for this moment
             </Text>
           </View>
 
-          <Ionicons
-            name="sparkles"
-            size={22}
-            color={colors.accent}
-          />
+          <Ionicons name="sparkles" size={22} color={colors.accent} />
         </View>
 
         <Pressable
@@ -628,10 +526,7 @@ export default function HomeScreen() {
             }
           }}
           disabled={featuredTracks.length === 0}
-          style={[
-            styles.featured,
-            { backgroundColor: featuredBackground },
-          ]}
+          style={[styles.featured, { backgroundColor: featuredBackground }]}
           accessibilityRole="button"
           accessibilityLabel="Play Evening Drive"
         >
@@ -639,9 +534,7 @@ export default function HomeScreen() {
             style={[
               styles.featuredGlow,
               {
-                backgroundColor: isDark
-                  ? '#7551A9'
-                  : '#C2A2F2',
+                backgroundColor: isDark ? "#7551A9" : "#C2A2F2",
               },
             ]}
           />
@@ -650,75 +543,42 @@ export default function HomeScreen() {
             style={[
               styles.featuredGlowSmall,
               {
-                backgroundColor: isDark
-                  ? '#A17ACF'
-                  : '#D4BDF5',
+                backgroundColor: isDark ? "#A17ACF" : "#D4BDF5",
               },
             ]}
           />
 
           <View style={styles.featuredTop}>
             <View style={styles.tag}>
-              <Ionicons
-                name="radio"
-                size={12}
-                color="#FFFFFF"
-              />
+              <Ionicons name="radio" size={12} color="#FFFFFF" />
 
-              <Text style={styles.tagText}>
-                DHUN EXCLUSIVE
-              </Text>
+              <Text style={styles.tagText}>DHUN EXCLUSIVE</Text>
             </View>
 
             <View style={styles.musicIconCircle}>
-              <Ionicons
-                name="musical-notes"
-                size={23}
-                color={featuredText}
-              />
+              <Ionicons name="musical-notes" size={23} color={featuredText} />
             </View>
           </View>
 
           <View style={styles.featuredContent}>
-            <Text
-              style={[
-                styles.featuredSmall,
-                { color: featuredMuted },
-              ]}
-            >
+            <Text style={[styles.featuredSmall, { color: featuredMuted }]}>
               A LITTLE MUSIC, A LOT OF FEELING
             </Text>
 
-            <Text
-              style={[
-                styles.featuredTitle,
-                { color: featuredText },
-              ]}
-            >
-              Evening{'\n'}Drive.
+            <Text style={[styles.featuredTitle, { color: featuredText }]}>
+              Evening{"\n"}Drive.
             </Text>
 
-            <Text
-              style={[
-                styles.featuredSub,
-                { color: featuredMuted },
-              ]}
-            >
+            <Text style={[styles.featuredSub, { color: featuredMuted }]}>
               {featuredTracks.length
                 ? `${featuredTracks.length} songs picked for you`
-                : 'Your mix is getting ready...'}
+                : "Your mix is getting ready..."}
             </Text>
 
             <View style={styles.playButton}>
-              <Ionicons
-                name="play"
-                size={17}
-                color="#211832"
-              />
+              <Ionicons name="play" size={17} color="#211832" />
 
-              <Text style={styles.playButtonText}>
-                Play mix
-              </Text>
+              <Text style={styles.playButtonText}>Play mix</Text>
             </View>
           </View>
         </Pressable>
@@ -727,21 +587,11 @@ export default function HomeScreen() {
       {/* MOOD SECTION */}
       <View style={styles.sectionContainer}>
         <View style={styles.moodHeading}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: colors.text },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             What's your mood?
           </Text>
 
-          <Text
-            style={[
-              styles.sectionSubtitle,
-              { color: colors.muted },
-            ]}
-          >
+          <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
             Find the sound that matches you.
           </Text>
         </View>
@@ -759,7 +609,7 @@ export default function HomeScreen() {
               ]}
               onPress={() =>
                 router.push({
-                  pathname: '/search',
+                  pathname: "/search",
                   params: { q: mood.query },
                 })
               }
@@ -768,29 +618,18 @@ export default function HomeScreen() {
                 style={[
                   styles.moodIcon,
                   {
-                    backgroundColor: isDark
-                      ? '#342548'
-                      : '#EDE4FF',
+                    backgroundColor: isDark ? "#342548" : "#EDE4FF",
                   },
                 ]}
               >
                 <Ionicons
                   name={mood.icon}
                   size={21}
-                  color={
-                    index % 2 === 0
-                      ? colors.accent
-                      : '#A98BE8'
-                  }
+                  color={index % 2 === 0 ? colors.accent : "#A98BE8"}
                 />
               </View>
 
-              <Text
-                style={[
-                  styles.moodName,
-                  { color: colors.text },
-                ]}
-              >
+              <Text style={[styles.moodName, { color: colors.text }]}>
                 {mood.name}
               </Text>
 
@@ -805,12 +644,7 @@ export default function HomeScreen() {
       </View>
 
       {/* LOADING */}
-      {loading ? (
-        <StateMessage
-          loading
-          text="Finding your music..."
-        />
-      ) : null}
+      {loading ? <StateMessage loading text="Finding your music..." /> : null}
 
       {/* ERROR */}
       {error ? (
@@ -824,6 +658,14 @@ export default function HomeScreen() {
       {/* SONG SECTIONS */}
       {!loading && !error ? (
         <>
+          {/* RECENTLY PLAYED - FIRST SONG ROW */}
+          <Row
+            title="Recently played"
+            subtitle="Pick up where you left off"
+            tracks={recent}
+            colors={colors}
+          />
+
           {/* CURATED PLAYLISTS */}
           {curatedPlaylists.map((playlist) => (
             <Row
@@ -834,13 +676,6 @@ export default function HomeScreen() {
               colors={colors}
             />
           ))}
-
-          <Row
-            title="Recently played"
-            subtitle="Pick up where you left off"
-            tracks={recent}
-            colors={colors}
-          />
 
           <Row
             title="For Arijit fans"
@@ -885,19 +720,11 @@ export default function HomeScreen() {
           />
 
           {loadingMore ? (
-            <StateMessage
-              loading
-              text="Loading more music..."
-            />
+            <StateMessage loading text="Loading more music..." />
           ) : null}
 
           {!hasMore && trending.length > 0 ? (
-            <Text
-              style={[
-                styles.endMessage,
-                { color: colors.muted },
-              ]}
-            >
+            <Text style={[styles.endMessage, { color: colors.muted }]}>
               You're all caught up!
             </Text>
           ) : null}
@@ -913,9 +740,9 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 22,
   },
 
@@ -924,8 +751,8 @@ const styles = StyleSheet.create({
   },
 
   brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 18,
   },
@@ -934,25 +761,25 @@ const styles = StyleSheet.create({
     width: 27,
     height: 27,
     borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   brandName: {
     fontSize: 19,
-    fontWeight: '900',
+    fontWeight: "900",
     letterSpacing: 1.2,
   },
 
   greeting: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.5,
   },
 
   title: {
     fontSize: 27,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: 5,
   },
 
@@ -962,8 +789,8 @@ const styles = StyleSheet.create({
   },
 
   headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
 
@@ -971,8 +798,8 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   profileButton: {
@@ -991,13 +818,13 @@ const styles = StyleSheet.create({
     width: 39,
     height: 39,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   avatarText: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: "800",
   },
 
   sectionContainer: {
@@ -1005,17 +832,17 @@ const styles = StyleSheet.create({
   },
 
   sectionHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 22,
     marginBottom: 15,
   },
 
   featuredHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 22,
     marginBottom: 15,
   },
@@ -1024,20 +851,20 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   eyebrow: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: 1.5,
     marginBottom: 7,
   },
 
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: "800",
   },
 
   sectionSubtitle: {
@@ -1051,12 +878,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     borderRadius: 26,
     padding: 21,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
+    justifyContent: "space-between",
+    overflow: "hidden",
   },
 
   featuredGlow: {
-    position: 'absolute',
+    position: "absolute",
     width: 230,
     height: 230,
     borderRadius: 120,
@@ -1066,7 +893,7 @@ const styles = StyleSheet.create({
   },
 
   featuredGlowSmall: {
-    position: 'absolute',
+    position: "absolute",
     width: 125,
     height: 125,
     borderRadius: 70,
@@ -1076,25 +903,25 @@ const styles = StyleSheet.create({
   },
 
   featuredTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: "rgba(255,255,255,0.16)",
     paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: 20,
   },
 
   tagText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: 1,
   },
 
@@ -1102,9 +929,9 @@ const styles = StyleSheet.create({
     width: 43,
     height: 43,
     borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   featuredContent: {
@@ -1113,13 +940,13 @@ const styles = StyleSheet.create({
 
   featuredSmall: {
     fontSize: 9,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 1.1,
   },
 
   featuredTitle: {
     fontSize: 38,
-    fontWeight: '900',
+    fontWeight: "900",
     lineHeight: 41,
     marginTop: 7,
   },
@@ -1130,11 +957,11 @@ const styles = StyleSheet.create({
   },
 
   playButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
     gap: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 22,
     paddingHorizontal: 17,
     paddingVertical: 11,
@@ -1142,8 +969,8 @@ const styles = StyleSheet.create({
   },
 
   playButtonText: {
-    color: '#211832',
-    fontWeight: '800',
+    color: "#211832",
+    fontWeight: "800",
     fontSize: 12,
   },
 
@@ -1152,18 +979,18 @@ const styles = StyleSheet.create({
   },
 
   moodGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingHorizontal: 22,
     gap: 10,
     marginTop: 15,
   },
 
   moodCard: {
-    width: '48%',
+    width: "48%",
     minHeight: 78,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 9,
     padding: 12,
     borderRadius: 17,
@@ -1175,14 +1002,14 @@ const styles = StyleSheet.create({
     width: 37,
     height: 37,
     borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   moodName: {
     flex: 1,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 
   trackList: {
@@ -1191,7 +1018,7 @@ const styles = StyleSheet.create({
   },
 
   endMessage: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
     fontSize: 12,
   },

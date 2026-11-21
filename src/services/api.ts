@@ -1,7 +1,6 @@
+import { Track } from "../types";
 
-import { Track } from '../types';
-
-const AUDIUS_API = 'https://api.audius.co/v1';
+const AUDIUS_API = process.env.EXPO_PUBLIC_AUDIUS_API_URL;
 
 type AudiusTrack = {
   track_id?: number;
@@ -11,9 +10,9 @@ type AudiusTrack = {
   is_available?: boolean;
   is_unlisted?: boolean;
   artwork?: {
-    '150x150'?: string;
-    '480x480'?: string;
-    '1000x1000'?: string;
+    "150x150"?: string;
+    "480x480"?: string;
+    "1000x1000"?: string;
   };
   stream?: {
     url?: string;
@@ -39,23 +38,20 @@ function mapTracks(data: AudiusTrack[] = []): Track[] {
         track.is_streamable === true &&
         track.is_available === true &&
         !track.is_unlisted &&
-        track.stream?.url
+        track.stream?.url,
     )
     .map((track) => ({
       id: String(track.track_id),
-      title: track.title ?? 'Unknown Track',
-      artist:
-        track.user?.name ??
-        track.user?.handle ??
-        'Unknown Artist',
-      album: track.album_backlink?.title ?? '',
+      title: track.title ?? "Unknown Track",
+      artist: track.user?.name ?? track.user?.handle ?? "Unknown Artist",
+      album: track.album_backlink?.title ?? "",
       artwork:
-        track.artwork?.['480x480'] ??
-        track.artwork?.['1000x1000'] ??
-        track.artwork?.['150x150'] ??
-        '',
+        track.artwork?.["480x480"] ??
+        track.artwork?.["1000x1000"] ??
+        track.artwork?.["150x150"] ??
+        "",
       previewUrl: track.stream!.url!,
-      genre: track.genre ?? '',
+      genre: track.genre ?? "",
     }));
 }
 
@@ -74,10 +70,10 @@ async function fetchTracks(endpoint: string): Promise<Track[]> {
 function normalize(value: string): string {
   return value
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -89,9 +85,8 @@ function similarity(a: string, b: string): number {
   if (!first || !second) return 0;
   if (first === second) return 1;
 
-  const matrix: number[][] = Array.from(
-    { length: first.length + 1 },
-    () => Array(second.length + 1).fill(0)
+  const matrix: number[][] = Array.from({ length: first.length + 1 }, () =>
+    Array(second.length + 1).fill(0),
   );
 
   for (let i = 0; i <= first.length; i++) {
@@ -104,13 +99,12 @@ function similarity(a: string, b: string): number {
 
   for (let i = 1; i <= first.length; i++) {
     for (let j = 1; j <= second.length; j++) {
-      const cost =
-        first[i - 1] === second[j - 1] ? 0 : 1;
+      const cost = first[i - 1] === second[j - 1] ? 0 : 1;
 
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + cost
+        matrix[i - 1][j - 1] + cost,
       );
     }
   }
@@ -129,18 +123,18 @@ function getMatchScore(track: Track, query: string): number {
   const combined = `${track.artist} ${track.title}`;
   const combinedScore = similarity(query, combined);
 
-  const queryWords = normalize(query).split(' ');
-  const artistWords = normalize(track.artist).split(' ');
-  const titleWords = normalize(track.title).split(' ');
+  const queryWords = normalize(query).split(" ");
+  const artistWords = normalize(track.artist).split(" ");
+  const titleWords = normalize(track.title).split(" ");
 
   const wordScore = Math.max(
     ...queryWords.map((word) =>
       Math.max(
         ...[...artistWords, ...titleWords].map((candidate) =>
-          similarity(word, candidate)
-        )
-      )
-    )
+          similarity(word, candidate),
+        ),
+      ),
+    ),
   );
 
   return Math.max(
@@ -148,15 +142,12 @@ function getMatchScore(track: Track, query: string): number {
     titleScore,
     albumScore,
     combinedScore,
-    wordScore * 0.9
+    wordScore * 0.9,
   );
 }
 
 // Search with partial matching and typo-tolerant ranking.
-export async function searchTracks(
-  term: string,
-  limit = 25
-): Promise<Track[]> {
+export async function searchTracks(term: string, limit = 25): Promise<Track[]> {
   const query = term.trim();
 
   if (!query) return [];
@@ -164,7 +155,7 @@ export async function searchTracks(
   const safeLimit = Math.min(Math.max(limit, 1), 100);
 
   const directResults = await fetchTracks(
-    `/tracks/search?query=${encodeURIComponent(query)}&limit=${safeLimit}`
+    `/tracks/search?query=${encodeURIComponent(query)}&limit=${safeLimit}`,
   );
 
   let combined = [...directResults];
@@ -176,7 +167,7 @@ export async function searchTracks(
     if (firstWord.length >= 2) {
       try {
         const fallbackResults = await fetchTracks(
-          `/tracks/search?query=${encodeURIComponent(firstWord)}&limit=${safeLimit}`
+          `/tracks/search?query=${encodeURIComponent(firstWord)}&limit=${safeLimit}`,
         );
 
         combined = [...combined, ...fallbackResults];
@@ -188,7 +179,7 @@ export async function searchTracks(
 
   // Remove duplicate tracks.
   const uniqueTracks = Array.from(
-    new Map(combined.map((track) => [track.id, track])).values()
+    new Map(combined.map((track) => [track.id, track])).values(),
   );
 
   // Rank the most relevant matches first.
@@ -205,39 +196,37 @@ export async function searchTracks(
 // Trending tracks
 export async function getTrendingTracks(
   limit = 20,
-  offset = 0
+  offset = 0,
 ): Promise<Track[]> {
   return fetchTracks(
-    `/tracks/trending?time=week&limit=${limit}&offset=${offset}`
+    `/tracks/trending?time=week&limit=${limit}&offset=${offset}`,
   );
 }
 
 // Latest releases
 export async function getLatestTracks(
   limit = 20,
-  offset = 0
+  offset = 0,
 ): Promise<Track[]> {
-  return fetchTracks(
-    `/tracks/latest?limit=${limit}&offset=${offset}`
-  );
+  return fetchTracks(`/tracks/latest?limit=${limit}&offset=${offset}`);
 }
 
 // Tracks by genre
 export async function getGenreTracks(
   genre: string,
-  limit = 20
+  limit = 20,
 ): Promise<Track[]> {
   if (!genre.trim()) return [];
 
   return fetchTracks(
-    `/tracks/trending?genre=${encodeURIComponent(genre)}&time=week&limit=${limit}`
+    `/tracks/trending?genre=${encodeURIComponent(genre)}&time=week&limit=${limit}`,
   );
 }
 
 // Tracks by artist
 export async function getArtistTracks(
   artist: string,
-  limit = 20
+  limit = 20,
 ): Promise<Track[]> {
   if (!artist.trim()) return [];
 
@@ -248,5 +237,5 @@ export function formatTime(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds || 0));
   const m = Math.floor(s / 60);
 
-  return `${m}:${String(s % 60).padStart(2, '0')}`;
+  return `${m}:${String(s % 60).padStart(2, "0")}`;
 }
