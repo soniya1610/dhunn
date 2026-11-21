@@ -1,22 +1,19 @@
-import { getFirestore } from 'firebase/firestore';
-import { initializeApp, getApp, getApps } from 'firebase/app';
-import {
-  initializeAuth,
-  getAuth,
-} from 'firebase/auth';
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth, initializeAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 // @ts-expect-error Firebase v12 React Native export typing issue
-import { getReactNativePersistence } from 'firebase/auth';
+import { getReactNativePersistence } from "firebase/auth";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCT6EEO9PbmRX4e7kc93AsU2XwBI1S25Yk',
-  authDomain: 'dhunn-a95be.firebaseapp.com',
-  projectId: 'dhunn-a95be',
-  storageBucket: 'dhunn-a9S5be.firebasestorage.app',
-  messagingSenderId: '44400814165',
-  appId: '1:44400814165:web:260249dd53e0d0d35a8cdc',
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
